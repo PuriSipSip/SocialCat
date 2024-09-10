@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "302620187188",
+    "project_id": "socialcat-5e8af",
+    "storage_bucket": "socialcat-5e8af.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302620187188:android:bf1e58055e1192aec68861",
+        "android_client_info": {
+          "package_name": "com.utcc.socialcat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDd1kU1ion2VjgEfKEy0JFcPRCdD1IibBc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
