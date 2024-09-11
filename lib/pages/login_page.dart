@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/components/my_button.dart';
 import 'package:flutter_application_1/components/my_textfield.dart';
 import 'package:flutter_application_1/components/square_tile.dart';
@@ -15,7 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   // text editing controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-
+       
   // sign user in method
   void signUserIn() async {
     // show loading circle
@@ -42,37 +43,24 @@ class _LoginPageState extends State<LoginPage> {
       // pop the loading circle
       Navigator.pop(context);
 
-      // WRONG EMAIL
-      if (e.code == 'user-not-found') {
-        // show errpr to user
-        wrongEmailMessage();
-      } else if (e.code == 'wrong-password') {
-        // show error to user
-        wrongPasswordMessage();
-      }
+      // show error message
+      showErrorMessage(e.code);
     }
   }
 
-  // wrong email message popup
-  void wrongEmailMessage() {
+  // error meassge to user
+  void showErrorMessage(String message) {
     showDialog(
       context: context,
       builder: (context) {
-        return const AlertDialog(
-          title: Text('Incorrect Email'),
-        );
-      },
-    );
-  }
-
-  // wrong Password message popup
-  void wrongPasswordMessage() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const AlertDialog(
-          title: Text('Incorrect Password'),
-        );
+        return AlertDialog(
+            backgroundColor: Colors.lightBlue,
+            title: Center(
+              child: Text(
+                message,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ));
       },
     );
   }
