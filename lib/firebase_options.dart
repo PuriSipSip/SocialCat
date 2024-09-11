@@ -65,4 +65,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'socialcat-5e8af.appspot.com',
     iosBundleId: 'com.example.flutterApplication1',
   );
+
 }
