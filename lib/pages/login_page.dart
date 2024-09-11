@@ -90,9 +90,10 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 50),
 
               // logo
-              const Icon(
-                Icons.lock,
-                size: 100,
+              Image.asset(
+                'lib/images/Logo.png',
+                width: 140,
+                height: 140,
               ),
 
               const SizedBox(height: 50),
@@ -183,13 +184,20 @@ class _LoginPageState extends State<LoginPage> {
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // apple buttons
+                  SquareTile(imagePath: 'lib/images/apple.png'),
+
+                  SizedBox(width: 10),
+
                   // google buttons
                   SquareTile(imagePath: 'lib/images/google.png'),
 
                   SizedBox(width: 10),
 
-                  // apple buttons
-                  SquareTile(imagePath: 'lib/images/apple.png'),
+                  // facebook buttons
+                  SquareTile(
+                    imagePath: 'lib/images/facebook.png',
+                  )
                 ],
               ),
 
