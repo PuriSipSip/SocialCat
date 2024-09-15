@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/my_button.dart';
@@ -15,44 +16,67 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   // text editing controllers
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
-  // sign user up method
+  // register method
   void signUserUp() async {
     // show loading circle
     showDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
     );
 
-    // try creating the user
-    try {
-      // check if password is confirmed
-      if (passwordController.text == confirmPasswordController.text) {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+    // make sure passwords match
+    if (passwordController.text != confirmPasswordController.text) {
+      // pop loading circle
+      Navigator.pop(context);
+
+      //show error message to user
+      showErrorMessage("Passwords don't match!");
+    }
+
+    // if password do match
+    else {
+      // try creating the user
+      try {
+        // create the user
+        UserCredential? userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
-      } else {
-        // show error message, password don't match
-        showErrorMessage("Password don't match!");
+
+        // create a user document and add to firestore
+        createUserDocument(userCredential);
+
+        // pop loading circle
+        if (context.mounted) Navigator.pop(context);
+      } on FirebaseAuthException catch (e) {
+        // pop loading circle
+        Navigator.pop(context);
+
+        // display error message to user
+        showErrorMessage(e.code);
       }
+    }
+  }
 
-      // pop the loading circle
-      Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
-      // pop the loading circle
-      Navigator.pop(context);
-
-      // show error message
-      showErrorMessage(e.code);
+  // create a user document and collecty them in firestore
+  Future<void> createUserDocument(UserCredential? userCredential) async {
+    if (userCredential != null && userCredential.user != null) {
+      await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(userCredential.user!.email)
+          .set({
+        'email': userCredential.user!.email,
+        'username': usernameController.text,
+      });
     }
   }
 
@@ -73,7 +97,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // try sign in
+  // try sign in UI page
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,6 +128,15 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
 
                 const SizedBox(height: 25),
+
+                // username textfield
+                MyTextfield(
+                  controller: usernameController,
+                  hintText: 'Username',
+                  obscureText: false,
+                ),
+
+                const SizedBox(height: 10),
 
                 // username textfield
                 MyTextfield(
