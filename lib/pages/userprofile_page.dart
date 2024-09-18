@@ -13,7 +13,7 @@ class UserprofilePage extends StatelessWidget {
     if (currentUser != null) {
       return await FirebaseFirestore.instance
           .collection("Users")
-          .doc(currentUser!.email)
+          .doc(currentUser?.email)
           .get();
     } else {
       throw Exception("No user is logged in");
@@ -30,9 +30,12 @@ class UserprofilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profile"),
+        title: const Text(
+          "Profile",
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.grey[300],
+        backgroundColor: Colors.lightBlue,
         actions: [
           IconButton(onPressed: signUserOut, icon: const Icon(Icons.logout))
         ],
@@ -50,25 +53,16 @@ class UserprofilePage extends StatelessWidget {
           // error
           else if (snapshot.hasError) {
             return Text("Error: ${snapshot.error}");
-          }
-
-          // data received
-          else if (snapshot.hasData) {
-            // extract data
-            Map<String, dynamic>? user = snapshot.data!.data();
-
-            if (user != null) {
-              return Column(
-                children: [
-                  Text(user['email']),
-                  Text(user['username']),
-                ],
-              );
-            } else {
-              return const Text("No user data available");
-            }
+          } else if (snapshot.hasData && snapshot.data?.data() != null) {
+            Map<String, dynamic> user = snapshot.data!.data()!;
+            return Column(
+              children: [
+                Text(user['email']),
+                Text(user['username']),
+              ],
+            );
           } else {
-            return const Text("No data");
+            return const Text("No user data available");
           }
         },
       ),

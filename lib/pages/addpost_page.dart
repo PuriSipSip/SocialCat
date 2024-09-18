@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class AllpostPage extends StatelessWidget {
-  const AllpostPage({super.key});
+class AddpostPage extends StatelessWidget {
+  const AddpostPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Post'),
+        title: const Text('Add Post'),
       ),
       body: const Center(
-        child: Text('All Post Content'),
+        child: Text('Add Post Content'),
       ),
     );
   }
