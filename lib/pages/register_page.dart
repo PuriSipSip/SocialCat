@@ -53,7 +53,7 @@ class _RegisterPageState extends State<RegisterPage> {
         );
 
         // create a user document and add to firestore
-        createUserDocument(userCredential);
+        await createUserDocument(userCredential);
 
         // pop loading circle
         if (context.mounted) Navigator.pop(context);
