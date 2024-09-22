@@ -76,6 +76,8 @@ class _RegisterPageState extends State<RegisterPage> {
           .set({
         'email': userCredential.user!.email,
         'username': usernameController.text,
+        'photoURL':
+            'https://firebasestorage.googleapis.com/v0/b/socialcat-5e8af.appspot.com/o/dinosauravatar.png?alt=media&token=b3bbad75-a5ce-4866-a27b-447620405054'
       });
     }
   }

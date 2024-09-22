@@ -37,7 +37,12 @@ class UserprofilePage extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.lightBlue,
         actions: [
-          IconButton(onPressed: signUserOut, icon: const Icon(Icons.logout))
+          IconButton(
+              onPressed: signUserOut,
+              icon: const Icon(
+                Icons.logout,
+                color: Colors.white,
+              ))
         ],
       ),
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -55,11 +60,40 @@ class UserprofilePage extends StatelessWidget {
             return Text("Error: ${snapshot.error}");
           } else if (snapshot.hasData && snapshot.data?.data() != null) {
             Map<String, dynamic> user = snapshot.data!.data()!;
-            return Column(
-              children: [
-                Text(user['email']),
-                Text(user['username']),
-              ],
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Profile Section
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 120,
+                        color: Colors.grey[200],
+                      ),
+                      Positioned(
+                        top: 10,
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundImage: NetworkImage(user['photoURL']),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    user['username'],
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    user['bio'] ?? 'Loves Cats!',
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             );
           } else {
             return const Text("No user data available");
