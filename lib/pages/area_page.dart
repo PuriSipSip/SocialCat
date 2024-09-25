@@ -8,8 +8,9 @@ class AreaPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Area',
-          style: TextStyle(color: Colors.white),
+          'AREA',
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
         backgroundColor: Colors.lightBlue,

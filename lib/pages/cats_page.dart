@@ -12,7 +12,8 @@ class CatsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'CATS',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
         backgroundColor: Colors.lightBlue,
@@ -33,14 +34,14 @@ class CatsPage extends StatelessWidget {
               itemCount: cats.length,
               itemBuilder: (context, index) {
                 var catData = cats[index].data();
-
                 return CatProfileCard(
-                  catName: catData['catname'],
-                  bio: catData['bio'],
-                  catURL: catData['catURL'],
-                  age: catData['age'],
-                  sex: catData['sex'],
-                  breed: catData['breed'],
+                  catname: catData['catname'] ?? 'Unknown',
+                  bio: catData['bio'] ?? 'No bio available',
+                  catURL: catData['catURL'] ??
+                      'https://example.com/default-cat-image.jpg',
+                  age: catData['age'] ?? 'Unknown age',
+                  sex: catData['sex'] ?? 'Unknown sex',
+                  breed: catData['breed'] ?? 'Unknown breed',
                   vaccine: catData['vaccine'] ?? 'N/A',
                 );
               });

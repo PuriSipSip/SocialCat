@@ -68,7 +68,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: 'Me',
           ),
         ],
       ),

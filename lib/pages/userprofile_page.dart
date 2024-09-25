@@ -31,8 +31,9 @@ class UserprofilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Profile",
-          style: TextStyle(color: Colors.white),
+          "ME",
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
         backgroundColor: Colors.lightBlue,

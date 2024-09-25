@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -19,8 +18,9 @@ class HomePage extends StatelessWidget {
       // return มาจาก Navigation bar
       appBar: AppBar(
           title: const Text(
-            'Post',
-            style: TextStyle(color: Colors.white),
+            'POST',
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           centerTitle: true,
           backgroundColor: Colors.lightBlue,
