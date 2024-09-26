@@ -68,6 +68,7 @@ class _AreaPageState extends State<AreaPage> {
           mapController = controller;
           _getCurrentLocation(); // Get current location after map is created
         },
+        mapType: MapType.normal,
         initialCameraPosition: CameraPosition(
           target: _initialPosition,
           zoom: 19,
