@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/components/my_image_picker.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -7,7 +8,7 @@ class HomePage extends StatelessWidget {
   // current logged in user
   final user = FirebaseAuth.instance.currentUser!;
 
-  // sing user out method ออกจากระบบ
+  // sign user out method
   void signUserOut() {
     FirebaseAuth.instance.signOut();
   }
@@ -15,26 +16,38 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // return มาจาก Navigation bar
       appBar: AppBar(
-          title: const Text(
-            'POST',
-            style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
-          ),
-          centerTitle: true,
-          backgroundColor: Colors.lightBlue,
-          actions: [
-            IconButton(
-              onPressed: signUserOut,
-              icon: const Icon(
-                Icons.logout,
-                color: Colors.white,
-              ),
+        title: const Text(
+          'POST',
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.lightBlue,
+        actions: [
+          IconButton(
+            onPressed: signUserOut,
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
             ),
-          ]),
+          ),
+        ],
+      ),
       body: const Center(
         child: Text('Post Content'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showImagePickerBottomSheet(context),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ), // call image picker components
+        child: const Icon(
+          Icons.add_a_photo,
+          color: Colors.grey,
+        ),
       ),
     );
   }
