@@ -12,13 +12,21 @@ class PostButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        child: isLoading
-            ? const CircularProgressIndicator(color: Colors.white)
-            : const Text('Create Post'),
+    return Center(
+      child: SizedBox(
+        width: 150,
+        child: ElevatedButton(
+          onPressed: isLoading ? null : onPressed,
+          child: isLoading
+              ? const CircularProgressIndicator(color: Colors.white)
+              : const Text(
+                  'Post',
+                  style: TextStyle(
+                      color: Colors.lightBlue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
+        ),
       ),
     );
   }

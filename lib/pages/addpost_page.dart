@@ -104,7 +104,11 @@ class _AddpostPageState extends State<AddpostPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Post'),
+        title: const Text(
+          'New Post',
+          style: TextStyle(color: Colors.lightBlue),
+        ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
