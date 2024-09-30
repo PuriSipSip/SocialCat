@@ -2,18 +2,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostsModel {
   final String id;
-  final String email; // ใช้ email ในการอ้างถึงข้อมูลผู้ใช้ of the poster
+  final String email;
+  final String username;
+  final String photoURL;
   final String imageURL;
   final String description;
   final String catname;
   final GeoPoint location;
   final Timestamp timestamp;
-  final int likeCount; // like count of this post
-  final List<String> likesBy; // like of user IDs who liked this post
+  final int likeCount;
+  final List<String> likesBy;
+  final List<String> comments;
 
   PostsModel({
     required this.id,
-    required this.email, // ใช้ email ในการอ้างถึงข้อมูลผู้ใช้
+    required this.email,
+    required this.username,
+    required this.photoURL,
     required this.imageURL,
     required this.description,
     required this.catname,
@@ -21,40 +26,23 @@ class PostsModel {
     required this.timestamp,
     required this.likeCount,
     required this.likesBy,
+    required this.comments,
   });
 
-  // Convert a Firestore document to a PostsModel object (to use in the app)
-  factory PostsModel.fromDocument(DocumentSnapshot doc) {
+  factory PostsModel.fromMap(Map<String, dynamic> data) {
     return PostsModel(
-      id: doc.id,
-      email: doc['email'],
-      imageURL: doc['imageURL'],
-      description: doc['description'],
-      catname: doc['catname'],
-      location: doc['location'],
-      timestamp: doc['timestamp'],
-      likeCount: doc['likeCount'],
-      likesBy: List<String>.from(doc['likesBy'] ?? []),
+      id: data['id'],
+      email: data['email'] ?? 'Unknown email',
+      username: data['username'] ?? 'Unknown user',
+      photoURL: data['photoURL'] ?? '',
+      imageURL: data['imageURL'] ?? '',
+      description: data['description'] ?? 'No description',
+      catname: data['catname'] ?? 'Unknown cat',
+      location: data['location'] as GeoPoint, // แปลงเป็น GeoPoint
+      timestamp: data['timestamp'] as Timestamp, // แปลงเป็น Timestamp
+      likeCount: data['likeCount'] ?? 0, // ค่าเริ่มต้น 0
+      likesBy: List<String>.from(data['likesBy'] ?? []),
+      comments: List<String>.from(data['comments'] ?? []),
     );
   }
-
-  // ฟังก์ชันแปลงข้อมูลเป็น Map เพื่อบันทึกลง Firestore
-  // Convert a Post object to a map (to store in Firestore)
-  Map<String, dynamic> toMap() {
-    return {
-      'email': email,
-      'imageURL': imageURL,
-      'description': description,
-      'catname': catname,
-      'location': location,
-      'timestamp': timestamp,
-      'likeCount': likeCount,
-      'likesBy': likesBy,
-    };
-  }
 }
-
-// Firestore Collection for storing Posts data
-// Collection: Posts
-// Fields: imageURL, description, catname, location, comments, likes
-// User can comment and like posts
