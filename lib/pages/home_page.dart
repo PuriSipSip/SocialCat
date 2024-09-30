@@ -1,6 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/components/my_image_picker.dart';
+import 'package:flutter_application_1/pages/postview_page.dart';
+import 'package:flutter_application_1/models/posts_model.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart'; // ตรวจสอบให้แน่ใจว่าคุณนำเข้า PostsModel
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -9,9 +14,6 @@ class HomePage extends StatelessWidget {
   final user = FirebaseAuth.instance.currentUser!;
 
   // sign user out method
-  void signUserOut() {
-    FirebaseAuth.instance.signOut();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,29 +28,93 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.lightBlue,
         actions: [
           IconButton(
-            onPressed: signUserOut,
+            onPressed: () {},
             icon: const Icon(
-              Icons.logout,
+              Icons.swap_horiz_rounded,
               color: Colors.white,
             ),
           ),
         ],
       ),
-      body: const Center(
-        child: Text('Post Content'),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Posts')
+            .orderBy('timestamp', descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return CustomScrollView(
+            slivers: [
+              SliverGrid(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final snap = snapshot.data!.docs[index];
+                    final String imageURL = snap[
+                        'imageURL']; // เปลี่ยนให้ตรงกับชื่อฟิลด์ใน Firestore
+
+                    return GestureDetector(
+                      onTap: () {
+                        final post = PostsModel.fromMap(
+                            snap.data() as Map<String, dynamic>);
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => PostViewPage(post: post),
+                        ));
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(6.0), // ขอบ
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.grey,
+                          ),
+                          child: CachedNetworkImage(
+                            imageUrl: imageURL,
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  childCount: snapshot.data!.docs.length,
+                ),
+                gridDelegate: SliverQuiltedGridDelegate(
+                  crossAxisSpacing: 3,
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 3,
+                  pattern: const [
+                    QuiltedGridTile(2, 2),
+                    QuiltedGridTile(1, 1),
+                    QuiltedGridTile(1, 1),
+                    QuiltedGridTile(1, 1),
+                    QuiltedGridTile(1, 1),
+                    QuiltedGridTile(1, 1),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showImagePickerBottomSheet(context),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey[100],
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ), // call image picker components
+          borderRadius: BorderRadius.circular(30),
+        ),
         child: const Icon(
           Icons.add_a_photo,
-          color: Colors.grey,
+          color: Colors.lightBlue,
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
