@@ -45,9 +45,11 @@ class HomePage extends StatelessWidget {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
-
           return CustomScrollView(
             slivers: [
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 2),
+              ),
               SliverGrid(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
