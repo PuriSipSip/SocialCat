@@ -31,7 +31,7 @@ class PostsModel {
 
   factory PostsModel.fromMap(Map<String, dynamic> data) {
     return PostsModel(
-      id: data['id'],
+      id: data['id'] ?? 'Unknown id',
       email: data['email'] ?? 'Unknown email',
       username: data['username'] ?? 'Unknown user',
       photoURL: data['photoURL'] ?? '',
