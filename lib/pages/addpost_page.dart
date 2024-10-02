@@ -76,7 +76,6 @@ class _AddpostPageState extends State<AddpostPage> {
       catname: _catNameController.text,
       location: _currentLocation!,
       timestamp: Timestamp.now(),
-      likeCount: 0,
       likesBy: [],
       comments: [],
     );

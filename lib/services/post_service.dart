@@ -50,7 +50,6 @@ class PostService {
           'catname': post.catname,
           'location': post.location, // Use location GeoPoint
           'timestamp': post.timestamp,
-          'likeCount': post.likeCount,
           'likesBy': post.likesBy,
         });
       } else {
