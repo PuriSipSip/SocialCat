@@ -59,11 +59,17 @@ class HomePage extends StatelessWidget {
 
                     return GestureDetector(
                       onTap: () {
-                        final post = PostsModel.fromMap(
-                            snap.data() as Map<String, dynamic>);
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => PostViewPage(post: post),
-                        ));
+                        // ตรวจสอบว่ามีข้อมูลใน snap หรือไม่
+                        final snapData = snap.data() as Map<String, dynamic>?;
+                        if (snapData != null) {
+                          final post = PostsModel.fromMap(snapData);
+
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => PostViewPage(post: post),
+                            ),
+                          );
+                        }
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(6.0), // ขอบ
@@ -93,6 +99,12 @@ class HomePage extends StatelessWidget {
                   pattern: const [
                     QuiltedGridTile(2, 2),
                     QuiltedGridTile(1, 1),
+                    QuiltedGridTile(1, 1),
+                    QuiltedGridTile(1, 1),
+                    QuiltedGridTile(1, 1),
+                    QuiltedGridTile(1, 1),
+                    QuiltedGridTile(1, 1),
+                    QuiltedGridTile(2, 2),
                     QuiltedGridTile(1, 1),
                     QuiltedGridTile(1, 1),
                     QuiltedGridTile(1, 1),

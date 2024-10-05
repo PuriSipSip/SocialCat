@@ -10,7 +10,6 @@ class PostsModel {
   final String catname;
   final GeoPoint location;
   final Timestamp timestamp;
-  final int likeCount;
   final List<String> likesBy;
   final List<String> comments;
 
@@ -24,14 +23,13 @@ class PostsModel {
     required this.catname,
     required this.location,
     required this.timestamp,
-    required this.likeCount,
     required this.likesBy,
     required this.comments,
   });
 
   factory PostsModel.fromMap(Map<String, dynamic> data) {
     return PostsModel(
-      id: data['id'],
+      id: data['id'] ?? 'Unknown id',
       email: data['email'] ?? 'Unknown email',
       username: data['username'] ?? 'Unknown user',
       photoURL: data['photoURL'] ?? '',
@@ -40,7 +38,6 @@ class PostsModel {
       catname: data['catname'] ?? 'Unknown cat',
       location: data['location'] as GeoPoint, // แปลงเป็น GeoPoint
       timestamp: data['timestamp'] as Timestamp, // แปลงเป็น Timestamp
-      likeCount: data['likeCount'] ?? 0, // ค่าเริ่มต้น 0
       likesBy: List<String>.from(data['likesBy'] ?? []),
       comments: List<String>.from(data['comments'] ?? []),
     );

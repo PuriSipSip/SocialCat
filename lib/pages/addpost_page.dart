@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/my_imagepreview.dart';
 import 'package:flutter_application_1/components/my_postbutton.dart';
 import 'package:flutter_application_1/components/my_textinputfield.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:flutter_application_1/services/location_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/models/posts_model.dart';
 import 'package:flutter_application_1/services/post_service.dart';
@@ -21,37 +21,43 @@ class _AddpostPageState extends State<AddpostPage> {
   final TextEditingController _catNameController = TextEditingController();
   GeoPoint? _currentLocation;
   bool _isLoading = false;
+  String? _currentAddress;
+
+  // import location service
+  final LocationService _locationService = LocationService();
+
+  @override
+  void initState() {
+    super.initState();
+    _requestLocationPermission();
+  }
 
   // ฟังก์ชัน _requestLocationPermission
   Future<void> _requestLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-    if (permission == LocationPermission.deniedForever) {
-      // แจ้งเตือนผู้ใช้ว่าไม่สามารถเข้าถึงตำแหน่งได้
-      print(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    } else {
-      // สิทธิ์ได้รับการอนุญาตแล้ว สามารถดึงตำแหน่งได้
-      _getCurrentLocation();
-    }
+    await _locationService.requestLocationPermission();
+    _getCurrentLocation();
   }
 
   // ฟังก์ชันดึงตำแหน่งปัจจุบัน
   Future<void> _getCurrentLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition();
-      setState(() {
-        _currentLocation = GeoPoint(position.latitude, position.longitude);
-      });
-    } catch (e) {
-      print('Error getting location: $e');
-      // แจ้งเตือนผู้ใช้หากเกิดข้อผิดพลาด
+    _currentLocation = await _locationService.getCurrentLocation();
+    if (_currentLocation != null) {
+      _getCurrentAddress(
+          _currentLocation!.latitude, _currentLocation!.longitude);
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to get location: $e')),
+        const SnackBar(content: Text('Failed to get location')),
       );
     }
+  }
+
+  // ฟังก์ชันแสดงแปลงพิกัดเป็นชื่อสถานที่
+  Future<void> _getCurrentAddress(double latitude, double longitude) async {
+    String? address =
+        await _locationService.getCurrentAddress(latitude, longitude);
+    setState(() {
+      _currentAddress = address;
+    });
   }
 
   // ฟังก์ชันสร้างโพสต์
@@ -76,7 +82,6 @@ class _AddpostPageState extends State<AddpostPage> {
       catname: _catNameController.text,
       location: _currentLocation!,
       timestamp: Timestamp.now(),
-      likeCount: 0,
       likesBy: [],
       comments: [],
     );
@@ -91,13 +96,6 @@ class _AddpostPageState extends State<AddpostPage> {
 
     // กลับไปยังหน้า Home หรือแสดงข้อความยืนยัน
     Navigator.of(context).pop();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _requestLocationPermission();
-    _getCurrentLocation();
   }
 
   @override
@@ -116,7 +114,9 @@ class _AddpostPageState extends State<AddpostPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ImagePreview(imagePath: widget.image.path),
+
             const SizedBox(height: 16),
+
             TextInputField(
               controller: _descriptionController,
               labelText: 'Description',
@@ -125,13 +125,15 @@ class _AddpostPageState extends State<AddpostPage> {
               controller: _catNameController,
               labelText: 'Cat Name',
             ),
+
             const SizedBox(height: 16),
-            Text(
-              _currentLocation == null
-                  ? 'Getting current location...'
-                  : 'Location: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}',
-              style: const TextStyle(color: Colors.grey),
-            ),
+
+            // เมื่อได้รับพิกัดแล้ว เรียกฟังก์ชันเพื่อแปลงเป็นชื่อสถานที่
+            if (_currentAddress != null)
+              Text(
+                'Location: $_currentAddress (${_currentLocation?.latitude}, ${_currentLocation?.longitude})',
+                style: const TextStyle(color: Colors.grey),
+              ),
             const SizedBox(height: 16),
             PostButton(
               isLoading: _isLoading,
