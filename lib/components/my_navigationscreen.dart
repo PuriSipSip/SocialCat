@@ -50,7 +50,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.lightBlue,
+        selectedItemColor: Colors.lightBlueAccent,
         unselectedItemColor: Colors.grey,
         currentIndex: _currentIndex,
         onTap: navigationTapped,

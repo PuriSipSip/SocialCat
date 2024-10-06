@@ -118,14 +118,14 @@ class HomePage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showImagePickerBottomSheet(context),
-        backgroundColor: Colors.grey[100],
+        backgroundColor: Colors.lightBlueAccent,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
         child: const Icon(
           Icons.add_a_photo,
-          color: Colors.lightBlue,
+          color: Colors.white,
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
