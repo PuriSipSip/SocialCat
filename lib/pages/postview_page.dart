@@ -1,17 +1,36 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/components/my_comment.dart';
 import 'package:flutter_application_1/models/posts_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_application_1/services/post_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-class PostViewPage extends StatelessWidget {
+class PostViewPage extends StatefulWidget {
   final PostsModel post;
-  final PostService postService = PostService();
 
-  PostViewPage({super.key, required this.post});
+  const PostViewPage({super.key, required this.post});
+
+  @override
+  _PostViewPageState createState() => _PostViewPageState();
+}
+
+class _PostViewPageState extends State<PostViewPage> {
+  final PostService _postService = PostService();
+
+  late PostsModel post;
+
+  @override
+  void initState() {
+    super.initState();
+    post = widget.post; // กำหนดค่าเริ่มต้นของ post
+  }
 
   @override
   Widget build(BuildContext context) {
+    // current logged in user
+    final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -24,7 +43,7 @@ class PostViewPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Avatar , username
+                // Avatar, username
                 Row(
                   children: [
                     CircleAvatar(
@@ -45,8 +64,9 @@ class PostViewPage extends StatelessWidget {
                     ),
                     const Spacer(),
                     IconButton(
-                        icon: Icon(Icons.more_horiz, color: Colors.grey[500]),
-                        onPressed: () {})
+                      icon: Icon(Icons.more_horiz, color: Colors.grey[500]),
+                      onPressed: () {},
+                    ),
                   ],
                 ),
 
@@ -74,7 +94,7 @@ class PostViewPage extends StatelessWidget {
                   ),
                 ),
 
-                // catname , iconlike , comment
+                // catname, iconlike, comment
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: Row(
@@ -90,13 +110,30 @@ class PostViewPage extends StatelessWidget {
                       Row(
                         children: [
                           IconButton(
-                            icon: const Icon(
-                              Icons.favorite_border_outlined,
+                            icon: Icon(
+                              post.likesBy.contains(
+                                      user?.displayName ?? user?.email)
+                                  ? Icons.favorite // ถ้ากด like
+                                  : Icons
+                                      .favorite_border_outlined, // ถ้ายังไม่กด
+                              color: post.likesBy.contains(
+                                      user?.displayName ?? user?.email)
+                                  ? Colors.red // สีแดงถ้ากด like
+                                  : Colors.black, // สีดำถ้ายังไม่กด
                             ),
-                            onPressed: () {
-                              // funtion likepost
-                              print('Liking post with ID: ${post.id}');
-                              postService.likePost(post.id, post.username);
+                            onPressed: () async {
+                              // Function like post
+                              await _postService.likePost(post.id);
+                              // Refresh the post data
+                              final updatedPost =
+                                  await _postService.getPostById(post.id);
+                              // Update state with the new post data
+                              setState(() {
+                                if (updatedPost != null) {
+                                  post =
+                                      updatedPost; // Update post the latest data
+                                }
+                              });
                             },
                           ),
                           const SizedBox(
@@ -105,7 +142,7 @@ class PostViewPage extends StatelessWidget {
                           IconButton(
                             icon: const Icon(Icons.chat_bubble_outline),
                             onPressed: () {
-                              // funtion comment
+                              // Function comment
                             },
                           ),
                         ],
@@ -126,12 +163,12 @@ class PostViewPage extends StatelessWidget {
                     Text(
                       '${post.likesBy.length} likes',
                       style: const TextStyle(fontSize: 12),
-                    )
+                    ),
                   ],
                 ),
                 const Divider(),
 
-                // username , description
+                // username, description
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: RichText(
@@ -160,6 +197,7 @@ class PostViewPage extends StatelessWidget {
               ],
             ),
           ),
-        ));
+        ),
+        bottomSheet: CommentComponent(postId: post.id));
   }
 }
