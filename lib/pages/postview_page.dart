@@ -59,7 +59,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       post.username,
                       style: const TextStyle(
                           color: Colors.lightBlue,
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold),
                     ),
                     const Spacer(),
@@ -104,7 +104,7 @@ class _PostViewPageState extends State<PostViewPage> {
                         post.catname,
                         style: const TextStyle(
                             color: Colors.lightBlue,
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold),
                       ),
                       Row(
@@ -178,14 +178,14 @@ class _PostViewPageState extends State<PostViewPage> {
                           text: '${post.username}    ', // Username
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 16,
                             color: Colors.lightBlue,
                           ),
                         ),
                         TextSpan(
                           text: post.description, // Description
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             color: Colors.grey[800],
                             fontWeight: FontWeight.bold,
                           ),
