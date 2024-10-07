@@ -63,21 +63,12 @@ class PostService {
     }
   }
 
-  //  Delete a post from Firestore
-  Future<void> deletePost(String postId) async {
-    try {
-      await _firestore.collection('Posts').doc(postId).delete();
-    } catch (e) {
-      print('Error deleting post: $e');
-    }
-  }
-
   // addComment to collection Posts
   Future<void> addComment(String postId, String comment) async {
     try {
-      // ดึงข้อมูลผู้ใช้ที่แสดงความคิดเห็นได้ที่นี่
+      // ดึงข้อมูลผู้ใช้ที่แสดงความคิดเห็น
       User? currentUser = _auth.currentUser;
-      String username = currentUser?.email ?? 'Anonymous';
+      String username = currentUser?.displayName ?? 'Anonymous';
 
       // เพิ่มความคิดเห็นในคอลเล็กชันย่อย
       await _firestore
@@ -94,33 +85,57 @@ class PostService {
     }
   }
 
-  Future<void> likePost(String postId, String username) async {
-    try {
-      // ดึงข้อมูลโพสต์ที่ต้องการจาก Firestore
+  // addLike to collection Posts
+  Future<void> likePost(String postId) async {
+    final user = _auth.currentUser; // รับข้อมูลผู้ใช้ที่เข้าสู่ระบบ
+    if (user == null) return; // ตรวจสอบว่าผู้ใช้ล็อกอินอยู่หรือไม่
 
-      DocumentSnapshot postDoc = await _postsCollection.doc(postId).get();
-      DocumentReference postRef =
-          FirebaseFirestore.instance.collection('Posts').doc(postId);
+    String username =
+        user.displayName ?? user.email ?? "Unknown"; // รับชื่อผู้ใช้
 
-      if (postDoc.exists) {
-        List<String> likesBy = List<String>.from(postDoc['likesBy'] ?? []);
+    DocumentReference postRef = _postsCollection.doc(postId);
+
+    // เริ่มทำการเรียกข้อมูลโพสต์
+    await _firestore.runTransaction((transaction) async {
+      DocumentSnapshot postSnapshot = await transaction.get(postRef);
+
+      if (!postSnapshot.exists) {
+        throw Exception("Post does not exist!");
+      }
+
+      Map<String, dynamic>? postData =
+          postSnapshot.data() as Map<String, dynamic>?;
+
+      if (postData != null) {
+        List<String> likesBy = List<String>.from(postData['likesBy'] ?? []);
 
         if (likesBy.contains(username)) {
-          // ถ้าผู้ใช้เคยไลค์แล้ว ให้ลบออก (Unlike)
-          await postRef.update({
-            'likesBy': FieldValue.arrayRemove([username]),
-          });
+          likesBy.remove(username);
         } else {
-          // ถ้าผู้ใช้ยังไม่ไลค์ ให้เพิ่มเข้าไป (Like)
-          await postRef.update({
-            'likesBy': FieldValue.arrayUnion([username]),
-          });
+          likesBy.add(username);
         }
+
+        // Update the Firestore document
+        transaction.update(postRef, {'likesBy': likesBy});
       } else {
-        print('Post not found');
+        throw Exception("Post data is null!");
+      }
+    });
+  }
+
+  Future<PostsModel?> getPostById(String postId) async {
+    try {
+      DocumentSnapshot postSnapshot = await _postsCollection.doc(postId).get();
+      if (postSnapshot.exists) {
+        Map<String, dynamic>? postData =
+            postSnapshot.data() as Map<String, dynamic>?;
+        // สร้างและคืนค่า PostsModel จากข้อมูลที่ดึงมา
+        return PostsModel.fromMap(postData!);
+      } else {
+        return null;
       }
     } catch (e) {
-      print('Error updating likes: $e');
+      return null;
     }
   }
 }
