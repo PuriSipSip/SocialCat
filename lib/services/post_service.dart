@@ -9,6 +9,8 @@ class PostService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage =
       FirebaseStorage.instance; // Firebase Storage instance
+  final CollectionReference _postsCollection =
+      FirebaseFirestore.instance.collection('Posts');
 
   // Add a new post to Firestore
   Future<void> createPost(PostsModel post) async {
@@ -43,6 +45,7 @@ class PostService {
 
         // Step 3: Create the post using the image URL
         await _firestore.collection('Posts').doc(post.id).set({
+          'id': post.id,
           'username': username, // Use username instead of email
           'photoURL': photoURL, // Use photoURL
           'imageURL': imageUrl, // Use the URL from Firebase Storage
@@ -88,6 +91,36 @@ class PostService {
       });
     } catch (e) {
       print('Error adding comment: $e');
+    }
+  }
+
+  Future<void> likePost(String postId, String username) async {
+    try {
+      // ดึงข้อมูลโพสต์ที่ต้องการจาก Firestore
+
+      DocumentSnapshot postDoc = await _postsCollection.doc(postId).get();
+      DocumentReference postRef =
+          FirebaseFirestore.instance.collection('Posts').doc(postId);
+
+      if (postDoc.exists) {
+        List<String> likesBy = List<String>.from(postDoc['likesBy'] ?? []);
+
+        if (likesBy.contains(username)) {
+          // ถ้าผู้ใช้เคยไลค์แล้ว ให้ลบออก (Unlike)
+          await postRef.update({
+            'likesBy': FieldValue.arrayRemove([username]),
+          });
+        } else {
+          // ถ้าผู้ใช้ยังไม่ไลค์ ให้เพิ่มเข้าไป (Like)
+          await postRef.update({
+            'likesBy': FieldValue.arrayUnion([username]),
+          });
+        }
+      } else {
+        print('Post not found');
+      }
+    } catch (e) {
+      print('Error updating likes: $e');
     }
   }
 }

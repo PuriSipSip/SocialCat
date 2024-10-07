@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/posts_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_application_1/services/post_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class PostViewPage extends StatelessWidget {
   final PostsModel post;
+  final PostService postService = PostService();
 
-  const PostViewPage({super.key, required this.post});
+  PostViewPage({super.key, required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -88,9 +90,13 @@ class PostViewPage extends StatelessWidget {
                       Row(
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.favorite_border),
+                            icon: const Icon(
+                              Icons.favorite_border_outlined,
+                            ),
                             onPressed: () {
                               // funtion likepost
+                              print('Liking post with ID: ${post.id}');
+                              postService.likePost(post.id, post.username);
                             },
                           ),
                           const SizedBox(
