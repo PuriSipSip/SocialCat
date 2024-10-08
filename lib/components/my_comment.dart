@@ -44,6 +44,7 @@ class _CommentComponentState extends State<CommentComponent> {
                   fontSize: 14,
                 ),
                 border: OutlineInputBorder(
+                  borderSide: BorderSide.none,
                   borderRadius: BorderRadius.all(Radius.circular(100)),
                 ),
                 filled: true,
@@ -52,7 +53,8 @@ class _CommentComponentState extends State<CommentComponent> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.pets, color: Colors.black),
+            icon: const Icon(Icons.pets_outlined),
+            color: Colors.black,
             onPressed: _submitComment, // เรียกใช้ฟังก์ชันเมื่อกดปุ่มส่ง
           ),
         ],

@@ -4,6 +4,7 @@ import 'package:flutter_application_1/components/my_comment.dart';
 import 'package:flutter_application_1/models/posts_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_application_1/services/post_service.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class PostViewPage extends StatefulWidget {
@@ -113,9 +114,9 @@ class _PostViewPageState extends State<PostViewPage> {
                             icon: Icon(
                               post.likesBy.contains(
                                       user?.displayName ?? user?.email)
-                                  ? Icons.favorite // ถ้ากด like
+                                  ? Icons.favorite_rounded // ถ้ากด like
                                   : Icons
-                                      .favorite_border_outlined, // ถ้ายังไม่กด
+                                      .favorite_border_rounded, // ถ้ายังไม่กด
                               color: post.likesBy.contains(
                                       user?.displayName ?? user?.email)
                                   ? Colors.red // สีแดงถ้ากด like
@@ -140,7 +141,9 @@ class _PostViewPageState extends State<PostViewPage> {
                             width: 0.5,
                           ),
                           IconButton(
-                            icon: const Icon(Icons.chat_bubble_outline),
+                            icon: const FaIcon(FontAwesomeIcons.comment),
+                            iconSize: 22,
+                            color: Colors.black,
                             onPressed: () {
                               // Function comment
                             },
@@ -159,7 +162,8 @@ class _PostViewPageState extends State<PostViewPage> {
                     const SizedBox(
                       width: 6,
                     ),
-                    const Icon(Icons.favorite, color: Colors.red, size: 16),
+                    const Icon(Icons.favorite_rounded,
+                        color: Colors.red, size: 16),
                     Text(
                       '${post.likesBy.length} likes',
                       style: const TextStyle(fontSize: 12),

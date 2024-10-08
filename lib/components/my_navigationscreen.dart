@@ -3,8 +3,11 @@ import 'package:flutter_application_1/pages/area_page.dart';
 import 'package:flutter_application_1/pages/cats_page.dart';
 import 'package:flutter_application_1/pages/home_page.dart';
 import 'package:flutter_application_1/pages/userprofile_page.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class NavigationScreen extends StatefulWidget {
+  const NavigationScreen({super.key});
+
   @override
   _NavigationScreenState createState() => _NavigationScreenState();
 }
@@ -56,19 +59,23 @@ class _NavigationScreenState extends State<NavigationScreen> {
         onTap: navigationTapped,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            // ignore: deprecated_member_use
+            icon: FaIcon(FontAwesomeIcons.house),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pets),
+            icon: FaIcon(FontAwesomeIcons.cat),
             label: 'Cat',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.map),
+            icon: FaIcon(FontAwesomeIcons.mapLocationDot),
             label: 'Area',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(
+              Icons.person,
+              size: 28,
+            ),
             label: 'Me',
           ),
         ],

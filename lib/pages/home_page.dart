@@ -124,7 +124,7 @@ class HomePage extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
         ),
         child: const Icon(
-          Icons.add_a_photo,
+          Icons.add_a_photo_rounded,
           color: Colors.white,
         ),
       ),

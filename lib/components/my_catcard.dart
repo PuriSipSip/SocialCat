@@ -61,7 +61,7 @@ class CatProfileCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildInfoIcon(Icons.pets, '$age ปี'),
+              _buildInfoIcon(Icons.cake_rounded, '$age ปี'),
               _buildInfoIcon(Icons.transgender, sex),
             ],
           ),
