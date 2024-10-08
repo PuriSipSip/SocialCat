@@ -20,6 +20,7 @@ class _CommentComponentState extends State<CommentComponent> {
     if (comment.isNotEmpty) {
       await _postService.addComment(widget.postId, comment);
       _commentController.clear(); // เคลียร์ฟิลด์กรอกข้อความหลังจากส่ง
+      FocusScope.of(context).unfocus(); // ปิดคีย์บอร์ดหลังจากส่งข้อความสำเร็จ
     } else {
       // แสดงข้อความเตือนหากฟิลด์ว่าง
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/models/comments_model.dart';
 
 class PostsModel {
   final String id;
@@ -11,7 +12,7 @@ class PostsModel {
   final GeoPoint location;
   final Timestamp timestamp;
   final List<String> likesBy;
-  final List<String> comments;
+  final List<CommentsModel> comments;
 
   PostsModel({
     required this.id,
@@ -27,6 +28,22 @@ class PostsModel {
     required this.comments,
   });
 
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'email': email,
+      'username': username,
+      'photoURL': photoURL,
+      'imageURL': imageURL,
+      'description': description,
+      'catname': catname,
+      'location': location,
+      'timestamp': timestamp,
+      'likesBy': likesBy,
+      'comments': comments.map((comment) => comment.toMap()).toList(),
+    };
+  }
+
   factory PostsModel.fromMap(Map<String, dynamic> data) {
     return PostsModel(
       id: data['id'] ?? 'Unknown id',
@@ -39,7 +56,9 @@ class PostsModel {
       location: data['location'] as GeoPoint, // แปลงเป็น GeoPoint
       timestamp: data['timestamp'] as Timestamp, // แปลงเป็น Timestamp
       likesBy: List<String>.from(data['likesBy'] ?? []),
-      comments: List<String>.from(data['comments'] ?? []),
+      comments: List<CommentsModel>.from(
+          data['comments']?.map((comment) => CommentsModel.fromMap(comment)) ??
+              []),
     );
   }
 }

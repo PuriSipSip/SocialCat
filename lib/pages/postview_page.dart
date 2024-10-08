@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/components/my_CommentList.dart';
 import 'package:flutter_application_1/components/my_comment.dart';
 import 'package:flutter_application_1/models/posts_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -18,7 +19,6 @@ class PostViewPage extends StatefulWidget {
 
 class _PostViewPageState extends State<PostViewPage> {
   final PostService _postService = PostService();
-
   late PostsModel post;
 
   @override
@@ -113,12 +113,12 @@ class _PostViewPageState extends State<PostViewPage> {
                           IconButton(
                             icon: Icon(
                               post.likesBy.contains(
-                                      user?.displayName ?? user?.email)
-                                  ? Icons.favorite_rounded // ถ้ากด like
+                                      user?.email) // ตรวจสอบจาก username
+                                  ? Icons.favorite_rounded // ถ้ากด like แล้ว
                                   : Icons
                                       .favorite_border_rounded, // ถ้ายังไม่กด
                               color: post.likesBy.contains(
-                                      user?.displayName ?? user?.email)
+                                      user?.email) // ตรวจสอบจาก username
                                   ? Colors.red // สีแดงถ้ากด like
                                   : Colors.black, // สีดำถ้ายังไม่กด
                             ),
@@ -198,6 +198,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     ),
                   ),
                 ),
+                CommentList(postId: post.id),
               ],
             ),
           ),

@@ -68,7 +68,16 @@ class PostService {
     try {
       // ดึงข้อมูลผู้ใช้ที่แสดงความคิดเห็น
       User? currentUser = _auth.currentUser;
-      String username = currentUser?.displayName ?? 'Anonymous';
+      String email = currentUser?.email ?? 'Anonymous';
+
+      // ดึง username จากคอลเล็กชัน Users โดยใช้ email
+      DocumentSnapshot userSnapshot = await _firestore
+          .collection('Users')
+          .doc(email) // ใช้ email เป็น docId ถ้าคุณเก็บข้อมูลแบบนี้
+          .get();
+
+      String username =
+          userSnapshot.exists ? userSnapshot['username'] : 'Anonymous';
 
       // เพิ่มความคิดเห็นในคอลเล็กชันย่อย
       await _firestore
@@ -85,13 +94,11 @@ class PostService {
     }
   }
 
-  // addLike to collection Posts
   Future<void> likePost(String postId) async {
     final user = _auth.currentUser; // รับข้อมูลผู้ใช้ที่เข้าสู่ระบบ
     if (user == null) return; // ตรวจสอบว่าผู้ใช้ล็อกอินอยู่หรือไม่
 
-    String username =
-        user.displayName ?? user.email ?? "Unknown"; // รับชื่อผู้ใช้
+    String email = user.email ?? "Unknown"; // รับอีเมลของผู้ใช้
 
     DocumentReference postRef = _postsCollection.doc(postId);
 
@@ -109,10 +116,10 @@ class PostService {
       if (postData != null) {
         List<String> likesBy = List<String>.from(postData['likesBy'] ?? []);
 
-        if (likesBy.contains(username)) {
-          likesBy.remove(username);
+        if (likesBy.contains(email)) {
+          likesBy.remove(email); // ลบอีเมลถ้าผู้ใช้กดไลค์แล้ว
         } else {
-          likesBy.add(username);
+          likesBy.add(email); // เพิ่มอีเมลถ้าผู้ใช้กดยังไม่ไลค์
         }
 
         // Update the Firestore document
