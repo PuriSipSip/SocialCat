@@ -12,13 +12,13 @@ class AreaPage extends StatefulWidget {
 
 class _AreaPageState extends State<AreaPage> {
   late GoogleMapController mapController;
-  final LatLng _bangkokCenter = const LatLng(13.7563, 100.5018);
+   final LatLng _utccCenter = const LatLng(13.7768, 100.5592); // พิกัดที่ถูกต้องของ UTCC
   Set<Marker> _markers = {};
 
-  // กำหนดขอบเขตของกรุงเทพมหานคร
-  final LatLngBounds bangkokBounds = LatLngBounds(
-    southwest: const LatLng(13.4947, 100.3271),
-    northeast: const LatLng(13.9557, 100.9384),
+  // กำหนดขอบเขตของมหาวิทยาลัยหอการค้าไทย
+  final LatLngBounds utccBounds = LatLngBounds(
+    southwest: const LatLng(13.7748, 100.5572), // ปรับขอบเขตให้ครอบคลุมพื้นที่มหาวิทยาลัย
+    northeast: const LatLng(13.7788, 100.5612),
   );
 
   @override
@@ -149,7 +149,7 @@ class _AreaPageState extends State<AreaPage> {
     );
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -164,18 +164,16 @@ class _AreaPageState extends State<AreaPage> {
         onMapCreated: (GoogleMapController controller) {
           mapController = controller;
           controller.setMapStyle('[{"featureType": "poi","stylers": [{"visibility": "off"}]}]');
-          controller.animateCamera(CameraUpdate.newLatLngBounds(bangkokBounds, 50.0));
+          controller.animateCamera(CameraUpdate.newLatLngBounds(utccBounds, 50.0));
         },
         initialCameraPosition: CameraPosition(
-          target: _bangkokCenter,
-          zoom: 18, // ปรับระดับซูมเริ่มต้นเป็น 18
+          target: _utccCenter,
+          zoom: 17,
         ),
         markers: _markers,
-        // จำกัดขอบเขตของแผนที่
-        cameraTargetBounds: CameraTargetBounds(bangkokBounds),
-        minMaxZoomPreference: MinMaxZoomPreference(10, 19), // ปรับค่า max zoom เป็น 19
+        cameraTargetBounds: CameraTargetBounds(utccBounds),
+        minMaxZoomPreference: MinMaxZoomPreference(15, 20),
       ),
-      
     );
   }
 }

@@ -1,106 +1,166 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class UserprofilePage extends StatelessWidget {
-  UserprofilePage({super.key});
+  UserprofilePage({Key? key}) : super(key: key);
 
-  // current logged in user
   final User? currentUser = FirebaseAuth.instance.currentUser;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // future to fetch user details
-  Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetail() async {
-    if (currentUser != null) {
-      return await FirebaseFirestore.instance
-          .collection("Users")
-          .doc(currentUser?.email)
-          .get();
-    } else {
-      throw Exception("No user is logged in");
+  Future<Map<String, dynamic>> _getUserData() async {
+    if (currentUser == null) {
+      throw Exception('No user logged in');
     }
+    
+    DocumentSnapshot userDoc = await _firestore.collection('Users').doc(currentUser!.email).get();
+    QuerySnapshot postsSnapshot = await _firestore.collection('Posts')
+        .where('username', isEqualTo: userDoc['username'])
+        .get();
+
+    return {
+      'user': userDoc.data() as Map<String, dynamic>,
+      'posts': postsSnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList(),
+    };
   }
 
-  // sign user out method
-  void signUserOut() {
-    FirebaseAuth.instance.signOut();
-  }
-
-  // UserProfile UI Page
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "ME",
-          style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.lightBlue,
-        actions: [
-          IconButton(
-              onPressed: signUserOut,
-              icon: const Icon(
-                Icons.logout,
-                color: Colors.white,
-              ))
-        ],
-      ),
-      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: getUserDetail(),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _getUserData(),
         builder: (context, snapshot) {
-          // loading..
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData) {
+            return Center(child: Text('No data available'));
           }
 
-          // error
-          else if (snapshot.hasError) {
-            return Text("Error: ${snapshot.error}");
-          } else if (snapshot.hasData && snapshot.data?.data() != null) {
-            Map<String, dynamic> user = snapshot.data!.data()!;
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  // Profile Section
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        height: 120,
-                        color: Colors.grey[200],
-                      ),
-                      Positioned(
-                        top: 10,
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: NetworkImage(user['photoURL']),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    user['username'],
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    user['bio'] ?? 'Loves Cats!',
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+          Map<String, dynamic> userData = snapshot.data!['user'];
+          List<Map<String, dynamic>> userPosts = snapshot.data!['posts'];
+
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 200.0,
+                floating: false,
+                pinned: true,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: _buildProfileHeader(userData),
+                ),
               ),
-            );
-          } else {
-            return const Text("No user data available");
-          }
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    _buildProfileActions(),
+                    SizedBox(height: 10),
+                    Text('Posts', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+              _buildPostsGrid(userPosts),
+            ],
+          );
         },
       ),
     );
   }
+
+  Widget _buildProfileHeader(Map<String, dynamic> userData) {
+  return Container(
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Colors.blue.shade700, Colors.blue.shade500],
+      ),
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CircleAvatar(
+          radius: 50,
+          backgroundImage: CachedNetworkImageProvider(userData['photoURL'] ?? ''),
+        ),
+        SizedBox(height: 10),
+        Text(
+          userData['username'] ?? 'User',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        SizedBox(height: 5),
+        Text(
+          userData['email'] ?? 'No email available',  // เปลี่ยนจาก bio เป็น email
+          style: TextStyle(fontSize: 14, color: Colors.white70),
+        ),
+      ],
+    ),
+  );
 }
+
+  Widget _buildProfileActions() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                // TODO: Implement edit profile functionality
+              },
+              child: Text('Edit Profile'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black, backgroundColor: Colors.grey[300],
+              ),
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                // TODO: Implement contact functionality
+              },
+              child: Text('Contact'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPostsGrid(List<Map<String, dynamic>> posts) {
+    return SliverPadding(
+      padding: EdgeInsets.all(10),
+      sliver: SliverGrid(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 1,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (BuildContext context, int index) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: CachedNetworkImage(
+                imageUrl: posts[index]['imageURL'] ?? '',
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(color: Colors.grey[300]),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
+            );
+          },
+          childCount: posts.length,
+        ),
+      ),
+    );
+  }
+}
+
