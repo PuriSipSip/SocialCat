@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart'; // import Firebase Storage
+import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/posts_model.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class PostService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -46,6 +48,7 @@ class PostService {
         // Step 3: Create the post using the image URL
         await _firestore.collection('Posts').doc(post.id).set({
           'id': post.id,
+          'email': email, // Use email instead of ID
           'username': username, // Use username instead of email
           'photoURL': photoURL, // Use photoURL
           'imageURL': imageUrl, // Use the URL from Firebase Storage
@@ -55,6 +58,16 @@ class PostService {
           'timestamp': post.timestamp,
           'likesBy': post.likesBy,
         });
+
+        // แสดงข้อความ Toast ว่าเพิ่มสำเร็จ
+        Fluttertoast.showToast(
+          msg:
+              'โพสต์ถูกเพิ่มแล้ว 😽 \n อย่าลืมเข้าไปแสดงความคิดเห็นด้วยละเหมียว 🐱',
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.lightBlueAccent,
+          textColor: Colors.white,
+        );
       } else {
         print('No user is logged in');
       }
@@ -143,6 +156,33 @@ class PostService {
       }
     } catch (e) {
       return null;
+    }
+  }
+
+  // funtion Deleate Post
+  // deletePost -> check email -> confirmdelete -> delete -> show toast -> go to HomePage
+  Future<bool> deletePost(String postId) async {
+    try {
+      await _postsCollection.doc(postId).delete();
+      // แสดงข้อความ Toast ว่าลบสำเร็จ
+      Fluttertoast.showToast(
+        msg: 'โพสต์โดนลบแล้ว 🙀 \nอย่าลืมกลับมาลงรูปภาพอีกนะเหมียว 😽',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return true;
+    } catch (e) {
+      // แสดงข้อความ Toast กรณีลบไม่สำเร็จ
+      Fluttertoast.showToast(
+        msg: 'Failed to delete post: $e',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.orange,
+        textColor: Colors.white,
+      );
+      return false;
     }
   }
 }

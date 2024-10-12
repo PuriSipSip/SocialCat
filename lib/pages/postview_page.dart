@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/components/confirmdelete.dart';
 import 'package:flutter_application_1/components/my_CommentList.dart';
 import 'package:flutter_application_1/components/my_comment.dart';
 import 'package:flutter_application_1/models/posts_model.dart';
@@ -66,7 +67,28 @@ class _PostViewPageState extends State<PostViewPage> {
                     const Spacer(),
                     IconButton(
                       icon: Icon(Icons.more_horiz, color: Colors.grey[500]),
-                      onPressed: () {},
+                      onPressed: () {
+                        if (user!.email == post.email) {
+                          // ตรวจสอบว่า username ตรงกับ user ที่เข้าสู่ระบบหรือไม่
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return Wrap(
+                                  children: [
+                                    ListTile(
+                                      leading: const Icon(Icons.delete,
+                                          color: Colors.red),
+                                      title: const Text('Delete'),
+                                      //funtionDelete
+                                      onTap: () =>
+                                          confirmDelete(context, post.id),
+                                    ),
+                                    const Divider(),
+                                  ],
+                                );
+                              });
+                        }
+                      },
                     ),
                   ],
                 ),

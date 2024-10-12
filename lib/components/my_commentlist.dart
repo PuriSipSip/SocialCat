@@ -25,7 +25,7 @@ class CommentList extends StatelessWidget {
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text('No comments yet.'));
+          return const Center(child: Text(''));
         }
 
         final comments = snapshot.data!.docs;
