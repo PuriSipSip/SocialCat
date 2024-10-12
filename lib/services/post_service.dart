@@ -98,6 +98,9 @@ class PostService {
           .doc(postId)
           .collection('comments')
           .add({
+        'commentId': DateTime.now()
+            .millisecondsSinceEpoch
+            .toString(), // เก็บ commentId ไว้
         'username': username,
         'comment': comment,
         'timestamp': FieldValue.serverTimestamp(),
@@ -164,6 +167,17 @@ class PostService {
   Future<bool> deletePost(String postId, String imageURL) async {
     try {
       await _postsCollection.doc(postId).delete();
+      // Delate sub-collection comments of post
+      await _firestore
+          .collection('Posts')
+          .doc(postId)
+          .collection('comments')
+          .get()
+          .then((querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          doc.reference.delete();
+        }
+      });
       await FirebaseStorage.instance.refFromURL(imageURL).delete();
       // แสดงข้อความ Toast ว่าลบสำเร็จ
       Fluttertoast.showToast(
