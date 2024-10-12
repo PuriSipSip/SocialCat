@@ -71,6 +71,8 @@ class _UserprofilePageState extends State<UserprofilePage> {
 
           Map<String, dynamic> userData = snapshot.data!['user'];
           List<Map<String, dynamic>> userPosts = snapshot.data!['posts'];
+          userPosts.sort((a, b) => //เปรียบเทียบค่าของ timestamp ของโพสต์ทั้งสอง
+              (b['timestamp'] as Timestamp).compareTo(a['timestamp']));
 
           return RefreshIndicator(
             onRefresh: () async {
