@@ -8,7 +8,7 @@ class UsersModel {
     required this.email,
     required this.username,
     required this.photoURL,
-    this.bio = 'love cats!', // Default value for bio
+    this.bio = 'loves cats!', // Default value for bio
   });
 
   // Convert model to Map for Firestore

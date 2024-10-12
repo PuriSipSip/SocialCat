@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_application_1/components/my_image_picker.dart';
 import 'package:flutter_application_1/pages/editprofile_page.dart';
 import 'package:flutter_application_1/auth/auth_page.dart';
 import 'package:flutter_application_1/pages/postview_page.dart';
 import 'package:flutter_application_1/models/posts_model.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class UserprofilePage extends StatefulWidget {
-  UserprofilePage({Key? key}) : super(key: key);
+  const UserprofilePage({super.key});
 
   @override
   _UserprofilePageState createState() => _UserprofilePageState();
@@ -23,18 +25,22 @@ class _UserprofilePageState extends State<UserprofilePage> {
     if (currentUser == null) {
       throw Exception('ไม่มีผู้ใช้ที่เข้าสู่ระบบ');
     }
-    
+
     // ดึงข้อมูลผู้ใช้
-    DocumentSnapshot userDoc = await _firestore.collection('Users').doc(currentUser!.email).get();
-    
+    DocumentSnapshot userDoc =
+        await _firestore.collection('Users').doc(currentUser!.email).get();
+
     // ดึงโพสต์ของผู้ใช้
-    QuerySnapshot postsSnapshot = await _firestore.collection('Posts')
+    QuerySnapshot postsSnapshot = await _firestore
+        .collection('Posts')
         .where('email', isEqualTo: currentUser!.email)
         .get();
 
     return {
       'user': userDoc.data() as Map<String, dynamic>,
-      'posts': postsSnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList(),
+      'posts': postsSnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList(),
     };
   }
 
@@ -42,7 +48,7 @@ class _UserprofilePageState extends State<UserprofilePage> {
   Future<void> _logout() async {
     await FirebaseAuth.instance.signOut();
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => AuthPage()),
+      MaterialPageRoute(builder: (context) => const AuthPage()),
       (Route<dynamic> route) => false,
     );
   }
@@ -54,13 +60,13 @@ class _UserprofilePageState extends State<UserprofilePage> {
         future: _getUserData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
             return Center(child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'));
           }
           if (!snapshot.hasData) {
-            return Center(child: Text('ไม่มีข้อมูล'));
+            return const Center(child: Text('ไม่มีข้อมูล'));
           }
 
           Map<String, dynamic> userData = snapshot.data!['user'];
@@ -77,12 +83,8 @@ class _UserprofilePageState extends State<UserprofilePage> {
                   child: Column(
                     children: [
                       _buildProfileActions(context),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          'โพสต์ของฉัน',
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
+                      const Padding(
+                        padding: EdgeInsets.all(4.0),
                       ),
                     ],
                   ),
@@ -99,7 +101,7 @@ class _UserprofilePageState extends State<UserprofilePage> {
   // สร้าง AppBar ที่มีข้อมูลโปรไฟล์ผู้ใช้
   Widget _buildAppBar(Map<String, dynamic> userData) {
     return SliverAppBar(
-      expandedHeight: 300.0,
+      expandedHeight: 250.0,
       floating: false,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
@@ -120,7 +122,7 @@ class _UserprofilePageState extends State<UserprofilePage> {
         Padding(
           padding: const EdgeInsets.only(right: 16.0),
           child: IconButton(
-            icon: Icon(Icons.logout, color: Colors.white),
+            icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: _logout,
             tooltip: 'ออกจากระบบ',
           ),
@@ -136,7 +138,7 @@ class _UserprofilePageState extends State<UserprofilePage> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.blue.shade700, Colors.blue.shade500],
+          colors: [Colors.lightBlueAccent, Colors.blue.shade400],
         ),
       ),
       child: Padding(
@@ -147,22 +149,26 @@ class _UserprofilePageState extends State<UserprofilePage> {
           children: [
             CircleAvatar(
               radius: 50,
-              backgroundImage: CachedNetworkImageProvider(userData['photoURL'] ?? ''),
+              backgroundImage:
+                  CachedNetworkImageProvider(userData['photoURL'] ?? ''),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               userData['username'] ?? 'ผู้ใช้',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+              style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               userData['email'] ?? 'ไม่มีอีเมล',
-              style: TextStyle(fontSize: 16, color: Colors.white70),
+              style: const TextStyle(fontSize: 16, color: Colors.white70),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              userData['bio'] ?? 'ไม่มีประวัติ',
-              style: TextStyle(fontSize: 16, color: Colors.white70),
+              userData['bio'] ?? 'loves cats!',
+              style: const TextStyle(fontSize: 16, color: Colors.white70),
               textAlign: TextAlign.center,
             ),
           ],
@@ -174,7 +180,7 @@ class _UserprofilePageState extends State<UserprofilePage> {
   // สร้างปุ่มสำหรับการดำเนินการกับโปรไฟล์
   Widget _buildProfileActions(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -187,30 +193,28 @@ class _UserprofilePageState extends State<UserprofilePage> {
                 );
                 setState(() {});
               },
-              icon: Icon(Icons.edit, color: Colors.black),
-              label: Text('แก้ไขโปรไฟล์'),
+              icon: Icon(Icons.edit, color: Colors.grey[700]),
+              label: const Text('Edit Profile'),
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black,
-                backgroundColor: Colors.grey[300],
-                padding: EdgeInsets.symmetric(vertical: 12),
+                foregroundColor: Colors.grey[700],
+                backgroundColor: Colors.grey[200],
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: () {
-                
-              },
-              icon: Icon(Icons.message, color: Colors.white),
-              label: Text('ติดต่อ'),
+              onPressed: () => showImagePickerBottomSheet(context),
+              icon: const Icon(Icons.add_outlined, color: Colors.white),
+              label: const Text('New Post'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
-                padding: EdgeInsets.symmetric(vertical: 12),
+                backgroundColor: Colors.lightBlueAccent,
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -225,14 +229,17 @@ class _UserprofilePageState extends State<UserprofilePage> {
   // สร้างกริดแสดงโพสต์ของผู้ใช้
   Widget _buildPostsGrid(List<Map<String, dynamic>> posts) {
     return SliverPadding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(0),
       sliver: SliverGrid(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          childAspectRatio: 1,
-        ),
+        gridDelegate: SliverQuiltedGridDelegate(
+            crossAxisCount: 3,
+            crossAxisSpacing: 3,
+            mainAxisSpacing: 3,
+            pattern: const [
+              QuiltedGridTile(1, 1),
+              QuiltedGridTile(1, 1),
+              QuiltedGridTile(1, 1),
+            ]),
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
             return GestureDetector(
@@ -248,17 +255,17 @@ class _UserprofilePageState extends State<UserprofilePage> {
                 );
               },
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(4),
                 child: CachedNetworkImage(
                   imageUrl: posts[index]['imageURL'] ?? '',
                   fit: BoxFit.cover,
                   placeholder: (context, url) => Container(
                     color: Colors.grey[300],
-                    child: Center(child: CircularProgressIndicator()),
+                    child: const Center(child: CircularProgressIndicator()),
                   ),
                   errorWidget: (context, url, error) => Container(
                     color: Colors.grey[300],
-                    child: Icon(Icons.error, color: Colors.red),
+                    child: const Icon(Icons.error, color: Colors.red),
                   ),
                 ),
               ),
