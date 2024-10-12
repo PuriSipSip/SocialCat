@@ -161,9 +161,10 @@ class PostService {
 
   // funtion Deleate Post
   // deletePost -> check email -> confirmdelete -> delete -> show toast -> go to HomePage
-  Future<bool> deletePost(String postId) async {
+  Future<bool> deletePost(String postId, String imageURL) async {
     try {
       await _postsCollection.doc(postId).delete();
+      await FirebaseStorage.instance.refFromURL(imageURL).delete();
       // แสดงข้อความ Toast ว่าลบสำเร็จ
       Fluttertoast.showToast(
         msg: 'โพสต์โดนลบแล้ว 🙀 \nอย่าลืมกลับมาลงรูปภาพอีกนะเหมียว 😽',

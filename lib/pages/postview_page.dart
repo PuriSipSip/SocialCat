@@ -80,8 +80,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                           color: Colors.red),
                                       title: const Text('Delete'),
                                       //funtionDelete
-                                      onTap: () =>
-                                          confirmDelete(context, post.id),
+                                      onTap: () => confirmDelete(
+                                          context, post.id, post.imageURL),
                                     ),
                                     const Divider(),
                                   ],

@@ -3,7 +3,7 @@ import 'package:flutter_application_1/components/my_navigationscreen.dart';
 import 'package:flutter_application_1/services/post_service.dart';
 
 // สร้างฟังก์ชัน confirmDelete สําหรับแสดง dialog ยืนยันการลบโพสต์
-void confirmDelete(BuildContext context, String postId) {
+void confirmDelete(BuildContext context, String postId, String imageURL) {
   final PostService postService = PostService();
 
   showDialog(
@@ -16,7 +16,7 @@ void confirmDelete(BuildContext context, String postId) {
           child: const Text('Delete', style: TextStyle(color: Colors.red)),
           onPressed: () async {
             // เรียกใช้ service เพื่อลบโพสต์
-            bool success = await postService.deletePost(postId);
+            bool success = await postService.deletePost(postId, imageURL);
 
             if (success) {
               // ปิด dialog
