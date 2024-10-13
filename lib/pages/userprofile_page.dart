@@ -27,22 +27,24 @@ class _UserprofilePageState extends State<UserprofilePage> {
     }
 
     // ดึงข้อมูลผู้ใช้
-    DocumentSnapshot userDoc =
-        await _firestore.collection('Users').doc(currentUser!.email).get();
+  DocumentSnapshot userDoc = await _firestore.collection('Users').doc(currentUser!.email).get();
+  
+  // ดึงโพสต์ของผู้ใช้
+  QuerySnapshot postsSnapshot = await _firestore.collection('Posts')
+      .where('email', isEqualTo: currentUser!.email)
+      .get();
 
-    // ดึงโพสต์ของผู้ใช้
-    QuerySnapshot postsSnapshot = await _firestore
-        .collection('Posts')
-        .where('email', isEqualTo: currentUser!.email)
-        .get();
+  // เรียงลำดับข้อมูลหลังจากได้รับมาแล้ว
+  List<Map<String, dynamic>> sortedPosts = postsSnapshot.docs
+      .map((doc) => doc.data() as Map<String, dynamic>)
+      .toList()
+    ..sort((a, b) => (b['timestamp'] as Timestamp).compareTo(a['timestamp'] as Timestamp));
 
-    return {
-      'user': userDoc.data() as Map<String, dynamic>,
-      'posts': postsSnapshot.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
-          .toList(),
-    };
-  }
+  return {
+    'user': userDoc.data() as Map<String, dynamic>,
+    'posts': sortedPosts,
+  };
+}
 
   // ฟังก์ชันออกจากระบบ
   Future<void> _logout() async {
