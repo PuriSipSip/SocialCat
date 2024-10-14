@@ -84,7 +84,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<String?> _uploadProfileImage(User user) async {
     if (_image != null) {
       String fileName = 'profile_${user.uid}.jpg';
-      Reference ref = FirebaseStorage.instance.ref().child('profile_images/$fileName');
+      Reference ref =
+          FirebaseStorage.instance.ref().child('profile_images/$fileName');
       await ref.putFile(_image!);
       return await ref.getDownloadURL();
     }
@@ -100,7 +101,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (imageUrl != null) {
       updateData['photoURL'] = imageUrl;
     }
-    await FirebaseFirestore.instance.collection('Users').doc(user.email).update(updateData);
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user.email)
+        .update(updateData);
   }
 
   // อัพเดท photoURL ในโพสต์ทั้งหมดของผู้ใช้
@@ -127,7 +131,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   // แสดง SnackBar แจ้งเตือนสำเร็จ
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+      ),
     );
   }
 
@@ -169,40 +176,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   // สร้างส่วนหัวของโปรไฟล์
   Widget _buildProfileImage() {
-  return Container(
-    padding: EdgeInsets.symmetric(vertical: 20),
-    child: Stack(
-      alignment: Alignment.center,
-      children: [
-        CircleAvatar(
-          radius: 60,
-          backgroundImage: _image != null 
-              ? FileImage(_image!) 
-              : (_currentPhotoURL != null 
-                  ? NetworkImage(_currentPhotoURL!) 
-                  : null) as ImageProvider?,
-          backgroundColor: Colors.grey[200],
-        ),
-        Positioned(
-          bottom: 0,
-          right: 0,
-          child: GestureDetector(
-            onTap: _pickImage,
-            child: Container(
-              padding: EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 20),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircleAvatar(
+            radius: 60,
+            backgroundImage: _image != null
+                ? FileImage(_image!)
+                : (_currentPhotoURL != null
+                    ? NetworkImage(_currentPhotoURL!)
+                    : null) as ImageProvider?,
+            backgroundColor: Colors.grey[200],
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: _pickImage,
+              child: Container(
+                padding: EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
               ),
-              child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   // สร้าง Widget สำหรับแสดงและเลือกรูปโปรไฟล์
   Widget _buildselectProfileImage() {
@@ -212,10 +219,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         children: [
           CircleAvatar(
             radius: 60,
-            backgroundImage: _image != null 
-                ? FileImage(_image!) 
-                : (_currentPhotoURL != null 
-                    ? NetworkImage(_currentPhotoURL!) 
+            backgroundImage: _image != null
+                ? FileImage(_image!)
+                : (_currentPhotoURL != null
+                    ? NetworkImage(_currentPhotoURL!)
                     : null) as ImageProvider?,
             backgroundColor: Colors.grey[300],
           ),
@@ -262,7 +269,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       controller: _bioController,
       decoration: InputDecoration(
         labelText: 'Bio',
-        prefixIcon: Icon(Icons.info),
+        prefixIcon: const Icon(Icons.edit),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -277,17 +284,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: _updateProfile,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: Text(
-            'Save Changes',
-            style: TextStyle(fontSize: 18),
-          ),
-        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.lightBlue,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.0),
+          child: Text(
+            'Save Changes',
+            style: TextStyle(fontSize: 18, color: Colors.white),
           ),
         ),
       ),
