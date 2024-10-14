@@ -14,18 +14,25 @@ class PostButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 150,
+        width: double.infinity,
         child: ElevatedButton(
           onPressed: isLoading ? null : onPressed,
-          child: isLoading
-              ? const CircularProgressIndicator(color: Colors.white)
-              : const Text(
-                  'Post',
-                  style: TextStyle(
-                      color: Colors.lightBlue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
-                ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.lightBlue,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text('Post',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16)),
+          ),
         ),
       ),
     );

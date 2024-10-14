@@ -26,14 +26,14 @@ class HomePage extends StatelessWidget {
         ),
         centerTitle: true,
         backgroundColor: Colors.lightBlue,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.swap_horiz_rounded,
-              color: Colors.white,
-            ),
-          ),
+        actions: const [
+          //IconButton(
+          //onPressed: () {},
+          //icon: Icon(
+          //Icons.qr_code_scanner_rounded,
+          //color: Colors.grey[300],
+          //),
+          //),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
