@@ -49,7 +49,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
           HomePage(),
           CatsPage(),
           AreaPage(),
-          UserprofilePage(),
+          const UserprofilePage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -74,7 +74,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
           BottomNavigationBarItem(
             icon: Icon(
               Icons.person,
-              size: 28,
+              size: 27,
             ),
             label: 'Me',
           ),

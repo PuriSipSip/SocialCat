@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/addpost_page.dart';
 import 'package:image_picker/image_picker.dart';
@@ -5,6 +6,9 @@ import 'package:image_picker/image_picker.dart';
 Future<void> showImagePickerBottomSheet(BuildContext context) async {
   final ImagePicker picker = ImagePicker();
   XFile? image;
+
+  final User? currentUser = FirebaseAuth.instance.currentUser;
+  bool isAdmin = currentUser?.email == 'admin@socialcat.com' ? true : false;
 
   await showModalBottomSheet(
     context: context,
@@ -44,6 +48,27 @@ Future<void> showImagePickerBottomSheet(BuildContext context) async {
               }
             },
           ),
+          // แสดง ListTile เฉพาะเมื่อเมื่อใช้อีเมลเป็น admin
+          isAdmin
+              ? ListTile(
+                  leading: const Icon(Icons.admin_panel_settings,
+                      color: Colors.blue),
+                  title: const Text('Admin เพิ่มข้อมูลแมว',
+                      style: TextStyle(color: Colors.blue)),
+                  onTap: () async {
+                    image = await picker.pickImage(source: ImageSource.gallery);
+                    if (image != null) {
+                      Navigator.pop(context); // ปิด bottom sheet
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddpostPage(image: image!),
+                        ),
+                      );
+                    }
+                  },
+                )
+              : Container(),
         ],
       );
     },
