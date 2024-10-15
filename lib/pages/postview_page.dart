@@ -19,7 +19,7 @@ class PostViewPage extends StatefulWidget {
 }
 
 class _PostViewPageState extends State<PostViewPage> {
-  final PostService _postService = PostService();
+  final PostService postService = PostService();
   late PostsModel post;
 
   @override
@@ -69,7 +69,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       icon: Icon(Icons.more_horiz, color: Colors.grey[500]),
                       onPressed: () {
                         if (user!.email == post.email) {
-                          // ตรวจสอบว่า username ตรงกับ user ที่เข้าสู่ระบบหรือไม่
+                          // ตรวจสอบว่า email ตรงกับ user ที่เข้าสู่ระบบหรือไม่
                           showModalBottomSheet(
                               context: context,
                               builder: (context) {
@@ -146,10 +146,10 @@ class _PostViewPageState extends State<PostViewPage> {
                             ),
                             onPressed: () async {
                               // Function like post
-                              await _postService.likePost(post.id);
+                              await postService.likePost(post.id);
                               // Refresh the post data
                               final updatedPost =
-                                  await _postService.getPostById(post.id);
+                                  await postService.getPostById(post.id);
                               // Update state with the new post data
                               setState(() {
                                 if (updatedPost != null) {
@@ -187,8 +187,8 @@ class _PostViewPageState extends State<PostViewPage> {
                     const Icon(Icons.favorite_rounded,
                         color: Colors.red, size: 16),
                     Text(
-                      '${post.likesBy.length} likes',
-                      style: const TextStyle(fontSize: 12),
+                      ' ${post.likesBy.length} ',
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                   ],
                 ),

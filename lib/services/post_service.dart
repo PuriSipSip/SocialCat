@@ -15,6 +15,7 @@ class PostService {
       FirebaseFirestore.instance.collection('Posts');
 
   // Add a new post to Firestore
+  // showImagePickerBottomSheet -> pickImage -> addpost_page -> requestPermission -> getLocation , getdecription , getcatname -> _createPost
   Future<void> createPost(PostsModel post) async {
     try {
       // Get the currently logged-in user's email
@@ -76,7 +77,8 @@ class PostService {
     }
   }
 
-  // addComment to collection Posts
+  // addComment to sub-collection Posts
+  // CommentComponent -> _submitComment -> addComment
   Future<void> addComment(String postId, String comment) async {
     try {
       // ดึงข้อมูลผู้ใช้ที่แสดงความคิดเห็น
@@ -86,7 +88,7 @@ class PostService {
       // ดึง username จากคอลเล็กชัน Users โดยใช้ email
       DocumentSnapshot userSnapshot = await _firestore
           .collection('Users')
-          .doc(email) // ใช้ email เป็น docId ถ้าคุณเก็บข้อมูลแบบนี้
+          .doc(email) // email เป็น docId
           .get();
 
       String username =
@@ -98,9 +100,6 @@ class PostService {
           .doc(postId)
           .collection('comments')
           .add({
-        'commentId': DateTime.now()
-            .millisecondsSinceEpoch
-            .toString(), // เก็บ commentId ไว้
         'username': username,
         'comment': comment,
         'timestamp': FieldValue.serverTimestamp(),
@@ -110,6 +109,7 @@ class PostService {
     }
   }
 
+  // likePost to collection Posts
   Future<void> likePost(String postId) async {
     final user = _auth.currentUser; // รับข้อมูลผู้ใช้ที่เข้าสู่ระบบ
     if (user == null) return; // ตรวจสอบว่าผู้ใช้ล็อกอินอยู่หรือไม่
@@ -119,31 +119,29 @@ class PostService {
     DocumentReference postRef = _postsCollection.doc(postId);
 
     // เริ่มทำการเรียกข้อมูลโพสต์
-    await _firestore.runTransaction((transaction) async {
-      DocumentSnapshot postSnapshot = await transaction.get(postRef);
+    await _firestore.runTransaction(
+      (transaction) async {
+        DocumentSnapshot postSnapshot = await transaction.get(postRef);
 
-      if (!postSnapshot.exists) {
-        throw Exception("Post does not exist!");
-      }
+        Map<String, dynamic>? postData =
+            postSnapshot.data() as Map<String, dynamic>?;
 
-      Map<String, dynamic>? postData =
-          postSnapshot.data() as Map<String, dynamic>?;
+        if (postData != null) {
+          List<String> likesBy = List<String>.from(postData['likesBy'] ?? []);
 
-      if (postData != null) {
-        List<String> likesBy = List<String>.from(postData['likesBy'] ?? []);
+          if (likesBy.contains(email)) {
+            likesBy.remove(email); // ลบอีเมลถ้าผู้ใช้กดไลค์แล้ว
+          } else {
+            likesBy.add(email); // เพิ่มอีเมลถ้าผู้ใช้กดยังไม่ไลค์
+          }
 
-        if (likesBy.contains(email)) {
-          likesBy.remove(email); // ลบอีเมลถ้าผู้ใช้กดไลค์แล้ว
+          // Update the Firestore document
+          transaction.update(postRef, {'likesBy': likesBy});
         } else {
-          likesBy.add(email); // เพิ่มอีเมลถ้าผู้ใช้กดยังไม่ไลค์
+          throw Exception("Post not found");
         }
-
-        // Update the Firestore document
-        transaction.update(postRef, {'likesBy': likesBy});
-      } else {
-        throw Exception("Post data is null!");
-      }
-    });
+      },
+    );
   }
 
   Future<PostsModel?> getPostById(String postId) async {
