@@ -29,6 +29,8 @@ dependencies:
   timeago: ^3.7.0
   font_awesome_flutter: ^10.7.0
   fluttertoast: ^8.2.8
+  qr_flutter: ^4.1.0
+  qr_code_scanner: ^1.0.1
 
 dev_dependencies:
   flutter_test:
