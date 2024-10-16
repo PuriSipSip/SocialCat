@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/addcat_page.dart';
 import 'package:flutter_application_1/pages/addpost_page.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -62,7 +63,7 @@ Future<void> showImagePickerBottomSheet(BuildContext context) async {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AddpostPage(image: image!),
+                          builder: (context) => AddCatPage(image: image!),
                         ),
                       );
                     }
