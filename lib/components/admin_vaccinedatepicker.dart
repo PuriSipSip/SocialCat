@@ -11,6 +11,8 @@ class VaccineDatePicker extends StatefulWidget {
 }
 
 class _VaccineDatePickerState extends State<VaccineDatePicker> {
+  DateTime? selectedDate;
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -25,6 +27,8 @@ class _VaccineDatePickerState extends State<VaccineDatePicker> {
           ),
         ),
       ),
+      validator: (value) =>
+          value!.isEmpty ? 'กรุณาเลือกวันที่ได้รับวัคซีน' : null,
       readOnly: true,
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
@@ -35,8 +39,9 @@ class _VaccineDatePickerState extends State<VaccineDatePicker> {
         );
 
         if (pickedDate != null) {
-          String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+          String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
           setState(() {
+            selectedDate = pickedDate;
             widget.controller.text =
                 formattedDate; // เก็บวันที่ใน TextEditingController
           });

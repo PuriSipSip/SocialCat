@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/components/admin_selectgender.dart';
@@ -5,8 +8,10 @@ import 'package:flutter_application_1/components/admin_vaccinedatepicker.dart';
 import 'package:flutter_application_1/components/my_imagepreview.dart';
 import 'package:flutter_application_1/components/my_postbutton.dart';
 import 'package:flutter_application_1/models/cats_model.dart';
+import 'package:flutter_application_1/services/cat_service.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class AddCatPage extends StatefulWidget {
   final XFile image;
@@ -77,6 +82,8 @@ class _AddCatPageState extends State<AddCatPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                validator: (value) =>
+                    value!.isEmpty ? 'กรุณากรอกชื่อแมว' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -99,6 +106,8 @@ class _AddCatPageState extends State<AddCatPage> {
                   ),
                   alignLabelWithHint: true,
                 ),
+                validator: (value) =>
+                    value!.isEmpty ? 'กรุณาบอกเรื่องราวของแมว' : null,
                 minLines: 2,
                 maxLines: 2,
               ),
@@ -119,6 +128,7 @@ class _AddCatPageState extends State<AddCatPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                validator: (value) => value!.isEmpty ? 'กรุณากรอกอายุ' : null,
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.digitsOnly
@@ -157,6 +167,8 @@ class _AddCatPageState extends State<AddCatPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                validator: (value) =>
+                    value!.isEmpty ? 'กรุณากรอกสายพันธุ์' : null,
               ),
 
               const SizedBox(height: 16),
@@ -181,6 +193,8 @@ class _AddCatPageState extends State<AddCatPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                validator: (value) =>
+                    value!.isEmpty ? 'กรุณากรอกสิ่งแมวที่ชอบ' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -199,6 +213,8 @@ class _AddCatPageState extends State<AddCatPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                validator: (value) =>
+                    value!.isEmpty ? 'กรุณากรอกสิ่งแมวที่ไม่ชอบ' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -217,6 +233,8 @@ class _AddCatPageState extends State<AddCatPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                validator: (value) =>
+                    value!.isEmpty ? 'กรุณากรอกนิสัยของแมว' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -235,6 +253,8 @@ class _AddCatPageState extends State<AddCatPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                validator: (value) =>
+                    value!.isEmpty ? 'กรุณากรอกสถานที่ชื่นชอบ' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -253,6 +273,8 @@ class _AddCatPageState extends State<AddCatPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                validator: (value) =>
+                    value!.isEmpty ? 'กรุณากรอกกิจกรรมประจำวัน' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -271,11 +293,13 @@ class _AddCatPageState extends State<AddCatPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                validator: (value) =>
+                    value!.isEmpty ? 'กรุณากรอกอาหารชื่นชอบ' : null,
               ),
               const SizedBox(height: 16),
               PostButton(
                 isLoading: _isLoading,
-                onPressed: () {},
+                onPressed: () => _createCat(XFile(widget.image.path)),
               ),
             ],
           ),
@@ -284,14 +308,12 @@ class _AddCatPageState extends State<AddCatPage> {
     );
   }
 
-  // ฟังก์ชันเพิ่มข้อมูลแมวในระบบ
+  // สำหรับบันทึกข้อมูลแมว
   Future<void> _createCat(XFile image) async {
-    //check form validation
-    if (_formKey.currentState!.validate()) {
+    // 1. ตรวจสอบฟอร์มก่อนบันทึก
+    if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('กรุณากรอกข้อมูลให้ครบ'),
-        ),
+        const SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบ')),
       );
       return;
     }
@@ -300,35 +322,73 @@ class _AddCatPageState extends State<AddCatPage> {
       _isLoading = true;
     });
 
-    // สร้าง CatsModel object
-    CatsModel cat = CatsModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      catname: _catnameController.text,
-      bio: _bioController.text,
-      age: int.tryParse(_ageController.text) ?? 0,
-      sex: _selectedGender ?? 'ไม่ทราบ',
-      breed: _breedController.text,
-      vaccineDate: _vaccineDateController.text.isNotEmpty
-          ? DateTime.parse(_vaccineDateController.text)
-          : DateTime.now(),
-      catURL: widget.image.path,
-      likes: _likesController.text,
-      dislikes: _dislikesController.text,
-      personality: _personalityController.text,
-      favoriteplace: _favoriteplaceController.text,
-      dailyactivity: _dailyactivityController.text,
-      favoritefood: _favoritefoodController.text,
-    );
+    try {
+      // 2. อัปโหลดรูปภาพไปยัง Firebase Storage
+      String fileName =
+          '${DateTime.now().millisecondsSinceEpoch}.jpg'; // ใช้เวลาในการตั้งชื่อไฟล์
+      Reference storageRef =
+          FirebaseStorage.instance.ref().child('imagecats/$fileName');
+      UploadTask uploadTask = storageRef.putFile(File(image.path));
+      TaskSnapshot taskSnapshot = await uploadTask;
+      String imageUrl = await taskSnapshot.ref
+          .getDownloadURL(); // ดึง URL ของรูปภาพจาก Firebase Storage
 
-    // เรียกใช้ service เพื่อสร้างข้อมูลแมว
-    // CatsService catService = CatService();
-    // await catService.createCat(cat);
+      // 3. แปลงวันที่วัคซีน
+      final DateTime parsedDate =
+          DateFormat('yyyy-MM-dd').parse(_vaccineDateController.text);
+      final Timestamp vaccineTimestamp = Timestamp.fromDate(parsedDate);
 
-    setState(() {
-      _isLoading = false;
-    });
+      // 4. สร้าง CatsModel
+      CatsModel cat = CatsModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        catname: _catnameController.text,
+        bio: _bioController.text,
+        age: int.tryParse(_ageController.text.trim()) ?? 0,
+        sex: _selectedGender ?? '',
+        breed: _breedController.text,
+        vaccineDate: vaccineTimestamp,
+        catURL: imageUrl,
+        likes: _likesController.text,
+        dislikes: _dislikesController.text,
+        personality: _personalityController.text,
+        favoriteplace: _favoriteplaceController.text,
+        dailyactivity: _dailyactivityController.text,
+        favoritefood: _favoritefoodController.text,
+      );
 
-    //กลับไปยังหน้า Home
-    Navigator.of(context).pop();
+      // 5. บันทึกข้อมูลลง Firestore
+      CatsService catService = CatsService();
+      await catService.createCats(cat);
+
+      if (mounted) {
+        Navigator.of(context).pop(); // กลับไปยังหน้า Home
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
+      );
+    } finally {
+      setState(
+        () {
+          _isLoading = false;
+        },
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _catnameController.dispose();
+    _bioController.dispose();
+    _ageController.dispose();
+    _breedController.dispose();
+    _vaccineDateController.dispose();
+    _likesController.dispose();
+    _dislikesController.dispose();
+    _personalityController.dispose();
+    _favoriteplaceController.dispose();
+    _dailyactivityController.dispose();
+    _favoritefoodController.dispose();
+    super.dispose();
   }
 }

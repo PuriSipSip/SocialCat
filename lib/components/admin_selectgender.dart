@@ -36,12 +36,12 @@ class SelectGender extends StatelessWidget {
       ),
       items: const [
         DropdownMenuItem(
-          value: 'เพศผู้',
-          child: Text('เพศผู้'),
+          value: 'ตัวผู้',
+          child: Text('ตัวผู้'),
         ),
         DropdownMenuItem(
-          value: 'เพศเมีย',
-          child: Text('เพศเมีย'),
+          value: 'ตัวเมีย',
+          child: Text('ตัวเมีย'),
         ),
       ],
       onChanged: onChanged,

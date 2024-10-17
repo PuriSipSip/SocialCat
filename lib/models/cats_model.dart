@@ -5,7 +5,8 @@
   - bio: ประวัติหรือข้อมูลเบื้องต้นของแมว (String)
   - sex: เพศของแมว (String)
   - breed: สายพันธุ์ของแมว (String)
-  - vaccineDate: วันที่ฉีดวัคซีน (DateTime)
+  - vaccineDate: วันที่ฉีดวัคซีน (Timestamp)
+  - catURL: URL ของภาพของแมว (String)
   - likes: สิ่งที่แมวชอบ (String)
   - dislikes: สิ่งที่แมวไม่ชอบ (String)
   - personality: นิสัยของแมว (String)
@@ -14,6 +15,8 @@
   - favoritefood: อาหารโปรดของแมว (String)
  */
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class CatsModel {
   String id; // Unique ID for each cat (could be linked to QR code )
   String catname;
@@ -21,7 +24,7 @@ class CatsModel {
   int age;
   String sex; // Cat's gender (Male/Female)
   String breed;
-  DateTime vaccineDate;
+  Timestamp vaccineDate;
   String catURL; // URL of the cat's image
   String likes;
   String dislikes;
@@ -55,7 +58,7 @@ class CatsModel {
         age: data['age'],
         sex: data['sex'],
         breed: data['breed'],
-        vaccineDate: data['vaccine'].toDate(),
+        vaccineDate: data['vaccine'] as Timestamp,
         catURL: data['catURL'],
         likes: data['likes'],
         dislikes: data['dislikes'],
