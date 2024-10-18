@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/addcat_page.dart';
 import 'package:flutter_application_1/pages/addpost_page.dart';
+import 'package:flutter_application_1/pages/edit_deleate_cat_page.dart';
 import 'package:image_picker/image_picker.dart';
 
 Future<void> showImagePickerBottomSheet(BuildContext context) async {
@@ -67,6 +68,23 @@ Future<void> showImagePickerBottomSheet(BuildContext context) async {
                         ),
                       );
                     }
+                  },
+                )
+              : Container(),
+          isAdmin
+              ? ListTile(
+                  leading: const Icon(Icons.admin_panel_settings,
+                      color: Colors.blue),
+                  title: const Text('Admin แก้ไขหรือลบข้อมูลแมว',
+                      style: TextStyle(color: Colors.blue)),
+                  onTap: () async {
+                    Navigator.pop(context); // ปิด bottom sheet
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EditAndDeleteCatPage(),
+                      ),
+                    );
                   },
                 )
               : Container(),
