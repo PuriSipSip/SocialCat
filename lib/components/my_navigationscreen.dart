@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/area_page.dart';
-import 'package:flutter_application_1/pages/cats_page.dart';
 import 'package:flutter_application_1/pages/home_page.dart';
 import 'package:flutter_application_1/pages/userprofile_page.dart';
+import 'package:flutter_application_1/pages/utcccats_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class NavigationScreen extends StatefulWidget {
@@ -47,7 +47,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
         onPageChanged: onPageChanged,
         children: [
           HomePage(),
-          CatsPage(),
+          UtcccatsPage(),
           AreaPage(),
           const UserprofilePage(),
         ],

@@ -41,4 +41,7 @@ flutter:
   uses-material-design: true
   assets:
     - lib/images/
+    - lib/images/imageCarousel1.png
+    - lib/images/ImageCarousel2.png
+    - lib/images/imageCarousel4.png
     - assets/cat_pin.svg
