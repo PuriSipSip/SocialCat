@@ -12,52 +12,118 @@ class AreaPage extends StatefulWidget {
 
 class _AreaPageState extends State<AreaPage> {
   late GoogleMapController mapController;
-   final LatLng _utccCenter = const LatLng(13.7768, 100.5592); // พิกัดที่ถูกต้องของ UTCC
-  Set<Marker> _markers = {};
-
-  // กำหนดขอบเขตของมหาวิทยาลัยหอการค้าไทย
-  final LatLngBounds utccBounds = LatLngBounds(
-    southwest: const LatLng(13.7748, 100.5572), // ปรับขอบเขตให้ครอบคลุมพื้นที่มหาวิทยาลัย
-    northeast: const LatLng(13.7788, 100.5612),
-  );
+  final LatLng _utccCenter = const LatLng(13.7768, 100.5592); // พิกัดศูนย์กลางของ UTCC
+  Set<Marker> _allMarkers = {};
+  Set<Marker> _filteredMarkers = {};
+  String _currentFilter = 'today';
 
   @override
-  void initState() {
-    super.initState();
-    _loadMarkers();
-  }
+void initState() {
+  super.initState();
+  _initializeMarkers();
+}
 
+Future<void> _initializeMarkers() async {
+  await _loadMarkers();
+  if (mounted) {
+    setState(() {
+      _currentFilter = 'today';
+    });
+    _filterMarkers('today');
+  }
+}
+
+  // โหลดข้อมูลหมุดทั้งหมดจาก Firestore
   Future<void> _loadMarkers() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Posts').get();
     
     for (var doc in querySnapshot.docs) {
-      GeoPoint geoPoint = doc['location'];
-      String imageUrl = doc['imageURL'];
-      String catName = doc['catname'] ?? 'Unknown Cat';
+      await _createMarkerFromDocument(doc);
+    }
+    _filterMarkers('all');
+  }
+
+  // สร้างหมุดจากข้อมูลเอกสาร Firestore
+  Future<void> _createMarkerFromDocument(DocumentSnapshot doc) async {
+    GeoPoint geoPoint = doc['location'];
+    String imageUrl = doc['imageURL'];
+    String catName = doc['catname'] ?? 'Unknown Cat';
+    
+    try {
+      final BitmapDescriptor markerIcon = await _createCustomMarkerImageFromUrl(imageUrl, catName);
       
-      try {
-        final BitmapDescriptor markerIcon = await _createCustomMarkerImageFromUrl(imageUrl, catName);
-        
-        setState(() {
-          _markers.add(Marker(
-            markerId: MarkerId(doc.id),
-            position: LatLng(geoPoint.latitude, geoPoint.longitude),
-            icon: markerIcon,
-            infoWindow: InfoWindow(
-              title: catName,
-              snippet: doc['description'] ?? 'No description',
-            ),
-            onTap: () => _showPostDetails(doc),
-          ));
-        });
-      } catch (e) {
-        print('Error creating marker for ${doc.id}: $e');
-        // ใช้ marker แบบ default หากมีข้อผิดพลาด
-      }
+      Marker marker = Marker(
+        markerId: MarkerId(doc.id),
+        position: LatLng(geoPoint.latitude, geoPoint.longitude),
+        icon: markerIcon,
+        onTap: () => _showPostDetails(doc),
+      );
+
+      setState(() {
+        _allMarkers.add(marker);
+      });
+    } catch (e) {
+      print('เกิดข้อผิดพลาดในการสร้างหมุดสำหรับ ${doc.id}: $e');
     }
   }
 
-  
+  // กรองหมุดตามช่วงเวลาที่กำหนด
+  Future<void> _filterMarkers(String filter) async {
+    setState(() {
+      _currentFilter = filter;
+    });
+
+    Set<Marker> newFilteredMarkers = {};
+    DateTime now = DateTime.now();
+
+    for (var marker in _allMarkers) {
+      DocumentSnapshot? docSnapshot = await _getDocumentFromMarkerId(marker.markerId.value);
+      if (docSnapshot != null && docSnapshot.exists) {
+        Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
+        if (data != null && data.containsKey('timestamp')) {
+          Timestamp timestamp = data['timestamp'];
+          DateTime postDate = timestamp.toDate();
+          Duration difference = now.difference(postDate);
+          
+          bool shouldInclude = _shouldIncludeMarker(filter, difference);
+
+          if (shouldInclude) {
+            newFilteredMarkers.add(marker);
+          }
+        }
+      }
+    }
+
+    setState(() {
+      _filteredMarkers = newFilteredMarkers;
+    });
+  }
+
+  // ตรวจสอบว่าควรรวมหมุดในการกรองหรือไม่
+  bool _shouldIncludeMarker(String filter, Duration difference) {
+    switch (filter) {
+      case 'today':
+        return difference.inDays == 0;
+      case 'threeDays':
+        return difference.inDays <= 2;
+      case 'all':
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  // ดึงข้อมูลเอกสารจาก Firestore โดยใช้ markerId
+  Future<DocumentSnapshot?> _getDocumentFromMarkerId(String markerId) async {
+    try {
+      return await FirebaseFirestore.instance.collection('Posts').doc(markerId).get();
+    } catch (e) {
+      print('เกิดข้อผิดพลาดในการดึงเอกสาร: $e');
+      return null;
+    }
+  }
+
+  // สร้างไอคอนหมุดแบบกำหนดเองจาก URL รูปภาพ
   Future<BitmapDescriptor> _createCustomMarkerImageFromUrl(String url, String catName) async {
     final int size = 150;
     final int imageSize = 120;
@@ -67,10 +133,8 @@ class _AreaPageState extends State<AreaPage> {
     final Paint shadowPaint = Paint()..color = Colors.black.withOpacity(0.3);
     final Paint bgPaint = Paint()..color = Colors.black;
 
-    // วาดเงา
+    // วาดเงาและพื้นหลัง
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2, shadowPaint);
-
-    // วาดพื้นหลังสีดำ
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2 - 3, bgPaint);
 
     // โหลดและวาดรูปภาพ
@@ -79,7 +143,7 @@ class _AreaPageState extends State<AreaPage> {
     final ui.Codec codec = await ui.instantiateImageCodec(imageData, targetWidth: imageSize, targetHeight: imageSize);
     final ui.FrameInfo fi = await codec.getNextFrame();
     
-    // คร็อปรูปภาพให้เป็นวงกลม
+    // ครอบตัดรูปภาพให้เป็นวงกลม
     final Path clipPath = Path();
     clipPath.addOval(Rect.fromLTWH(size / 2 - imageSize / 2, size / 2 - imageSize / 2, imageSize.toDouble(), imageSize.toDouble()));
     canvas.clipPath(clipPath);
@@ -98,7 +162,7 @@ class _AreaPageState extends State<AreaPage> {
     return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
   }
 
-  
+  // แสดงรายละเอียดของโพสต์เมื่อแตะที่หมุด
   void _showPostDetails(DocumentSnapshot doc) {
     showDialog(
       context: context,
@@ -128,6 +192,8 @@ class _AreaPageState extends State<AreaPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      _buildUserInfo(doc),
+                      SizedBox(height: 10),
                       Text(
                         doc['catname'] ?? 'Unknown Cat',
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -138,7 +204,7 @@ class _AreaPageState extends State<AreaPage> {
                   ),
                 ),
                 TextButton(
-                  child: Text('Close'),
+                  child: Text('ปิด'),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -149,31 +215,92 @@ class _AreaPageState extends State<AreaPage> {
     );
   }
 
-   @override
+  // สร้างส่วนแสดงข้อมูลผู้ใช้
+  Widget _buildUserInfo(DocumentSnapshot doc) {
+    return Row(
+      children: [
+        CircleAvatar(
+          backgroundImage: NetworkImage(doc['photoURL'] ?? ''),
+          radius: 20,
+        ),
+        SizedBox(width: 10),
+        Text(
+          doc['username'] ?? 'Unknown User',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'AREA',
+          'พื้นที่',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
         backgroundColor: Colors.lightBlue,
       ),
-      body: GoogleMap(
-        onMapCreated: (GoogleMapController controller) {
-          mapController = controller;
-          controller.setMapStyle('[{"featureType": "poi","stylers": [{"visibility": "off"}]}]');
-          controller.animateCamera(CameraUpdate.newLatLngBounds(utccBounds, 50.0));
-        },
-        initialCameraPosition: CameraPosition(
-          target: _utccCenter,
-          zoom: 17,
-        ),
-        markers: _markers,
-        cameraTargetBounds: CameraTargetBounds(utccBounds),
-        minMaxZoomPreference: MinMaxZoomPreference(15, 20),
+      body: Stack(
+        children: [
+          _buildGoogleMap(),
+          _buildFilterButtons(),
+        ],
       ),
+    );
+  }
+
+  // สร้าง Google Map
+  Widget _buildGoogleMap() {
+    return GoogleMap(
+      onMapCreated: (GoogleMapController controller) {
+        mapController = controller;
+        controller.setMapStyle('[{"featureType": "poi","stylers": [{"visibility": "off"}]}]');
+      },
+      initialCameraPosition: CameraPosition(
+        target: _utccCenter,
+        zoom: 17,
+      ),
+      markers: _filteredMarkers,
+    );
+  }
+
+  // สร้างปุ่มกรอง
+  Widget _buildFilterButtons() {
+    return Positioned(
+      top: 10,
+      left: 10,
+      right: 10,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildFilterButton('วันนี้', 'today'),
+              _buildFilterButton('3 วัน', 'threeDays'),
+              _buildFilterButton('ทั้งหมด', 'all'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // สร้างปุ่มกรองแต่ละปุ่ม
+  Widget _buildFilterButton(String label, String filter) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: _currentFilter == filter ? Colors.lightBlue : Colors.grey,
+      ),
+      child: Text(label),
+      onPressed: () => _filterMarkers(filter),
     );
   }
 }
