@@ -80,7 +80,11 @@ class HomePage extends StatelessWidget {
                           child: CachedNetworkImage(
                             imageUrl: imageURL,
                             placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
+                              child: LinearProgressIndicator(
+                                value: 0.5,
+                                color: Colors.grey,
+                                backgroundColor: Colors.grey,
+                              ),
                             ),
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.error),
