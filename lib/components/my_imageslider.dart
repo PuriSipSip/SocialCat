@@ -10,10 +10,10 @@ class MyImageSlider extends StatefulWidget {
 
 class _MyImageSliderState extends State<MyImageSlider> {
   final List<String> imagePaths = [
-    'lib/images/imageCarousel1.png',
-    'lib/images/imageCarousel2.png',
-    'lib/images/imageCarousel3.png',
-    'lib/images/imageCarousel4.png',
+    'lib/images/Carousel1.png',
+    'lib/images/Carousel2.png',
+    'lib/images/Carousel3.png',
+    'lib/images/Carousel4.png',
   ];
 
   int _currentIndex = 0;
