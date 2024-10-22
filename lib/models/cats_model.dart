@@ -58,7 +58,7 @@ class CatsModel {
         age: data['age'],
         sex: data['sex'],
         breed: data['breed'],
-        vaccineDate: data['vaccine'] as Timestamp,
+        vaccineDate: data['vaccineDate'] as Timestamp,
         catURL: data['catURL'],
         likes: data['likes'],
         dislikes: data['dislikes'],
