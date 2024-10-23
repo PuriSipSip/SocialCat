@@ -61,7 +61,7 @@ class QRScannerState extends State<QRScanner> {
                 ),
               ),
               Expanded(
-                flex: 5,
+                flex: 4,
                 child: Stack(
                   children: [
                     QRView(
