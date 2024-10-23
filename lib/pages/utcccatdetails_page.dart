@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_application_1/components/my_qrcode.dart';
+import 'package:flutter_application_1/pages/qrcode_page.dart';
 import 'package:flutter_application_1/models/cats_model.dart';
 import 'package:intl/intl.dart';
 
