@@ -105,8 +105,9 @@ class QRScannerState extends State<QRScanner> {
       });
 
       if (result != null) {
+        controller.stopCamera();
         // นำไปยังหน้า CatDetailsPage โดยใช้ catId ที่ได้จาก QR code
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => CatDetailsPage(catId: result!.code!),
