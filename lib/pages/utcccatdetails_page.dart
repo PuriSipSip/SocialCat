@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/components/my_qrcode.dart';
 import 'package:flutter_application_1/models/cats_model.dart';
 import 'package:intl/intl.dart';
 
@@ -16,12 +17,32 @@ class CatDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('ข้อมูลเพิ่มเติม'),
-          titleTextStyle: const TextStyle(
+        title: const Text('ข้อมูลเพิ่มเติม'),
+        titleTextStyle: const TextStyle(
+          color: Colors.lightBlue,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.lightBlue),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_sharp),
             color: Colors.lightBlue,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          )),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      QRCodePage(catId: catId), // ส่ง catId ไปยังหน้าใหม่
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance.collection('Cats').doc(catId).get(),
         builder: (context, snapshot) {
