@@ -8,6 +8,13 @@
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Your app needs access to the photo library to select photos and videos.</string>
 	<!-- End premispion camera & photo ... -->
+
+	<!-- permispion camera access to scan QR codes -->
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to scan QR codes</string>
+	<!-- End permispion camera access to scan QR codes-->
 	
 	<!-- Google Sign-in Section -->
 	<key>CFBundleURLTypes</key>

@@ -50,6 +50,10 @@
         <uses-feature
         android:name="android.hardware.location.gps"
         android:required="true"/>
+        <!-- Request permission to access the camera for scanning QR codes -->
+        <uses-permission android:name="android.permission.CAMERA" />
+        <!-- Ensure the app has camera hardware -->
+        <uses-feature android:name="android.hardware.camera" android:required="true" />
 
     <queries>
         <intent>
