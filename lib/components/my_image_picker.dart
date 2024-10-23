@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/components/my_qrscanner.dart';
 import 'package:flutter_application_1/pages/addcat_page.dart';
 import 'package:flutter_application_1/pages/addpost_page.dart';
 import 'package:flutter_application_1/pages/edit_deleate_cat_page.dart';
@@ -48,6 +49,19 @@ Future<void> showImagePickerBottomSheet(BuildContext context) async {
                   ),
                 );
               }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.qr_code_scanner_rounded),
+            title: const Text('Scan QR Code'),
+            onTap: () async {
+              Navigator.pop(context); // ปิด bottom sheet
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const QRScanner(),
+                ),
+              );
             },
           ),
           // แสดง ListTile เฉพาะเมื่อเมื่อใช้อีเมลเป็น admin
