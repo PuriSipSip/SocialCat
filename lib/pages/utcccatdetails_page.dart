@@ -109,8 +109,8 @@ class CatDetailsPage extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 25.0),
                         child: Text(
                           cat.bio,
-                          style: const TextStyle(
-                              fontSize: 15, color: Colors.black87),
+                          style:
+                              TextStyle(fontSize: 15, color: Colors.grey[700]),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -142,9 +142,9 @@ class CatDetailsPage extends StatelessWidget {
                               const SizedBox(height: 8),
                               Text(
                                 cat.personality,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
-                                  color: Colors.black87,
+                                  color: Colors.grey[700],
                                 ),
                               ),
                             ],
