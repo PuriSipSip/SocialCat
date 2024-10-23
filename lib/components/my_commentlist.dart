@@ -48,14 +48,14 @@ class CommentList extends StatelessWidget {
                       text: '$username    ', // Username
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 14,
                         color: Colors.lightBlue,
                       ),
                     ),
                     TextSpan(
                       text: comment, // Comment
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         color: Colors.grey[800],
                         fontWeight: FontWeight.bold,
                       ),
