@@ -31,6 +31,7 @@ dependencies:
   fluttertoast: ^8.2.8
   qr_flutter: ^4.1.0
   qr_code_scanner: ^1.0.1
+  rename_app: ^1.6.1
 
 dev_dependencies:
   flutter_test:
