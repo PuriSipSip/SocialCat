@@ -240,7 +240,7 @@ Future<void> _initializeMarkers() async {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'พื้นที่',
+          'AREA',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
