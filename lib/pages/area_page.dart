@@ -12,31 +12,33 @@ class AreaPage extends StatefulWidget {
 
 class _AreaPageState extends State<AreaPage> {
   late GoogleMapController mapController;
-  final LatLng _utccCenter = const LatLng(13.7768, 100.5592); // พิกัดศูนย์กลางของ UTCC
+  final LatLng _utccCenter =
+      const LatLng(13.7768, 100.5592); // พิกัดศูนย์กลางของ UTCC
   Set<Marker> _allMarkers = {};
   Set<Marker> _filteredMarkers = {};
   String _currentFilter = 'today';
 
   @override
-void initState() {
-  super.initState();
-  _initializeMarkers();
-}
-
-Future<void> _initializeMarkers() async {
-  await _loadMarkers();
-  if (mounted) {
-    setState(() {
-      _currentFilter = 'today';
-    });
-    _filterMarkers('today');
+  void initState() {
+    super.initState();
+    _initializeMarkers();
   }
-}
+
+  Future<void> _initializeMarkers() async {
+    await _loadMarkers();
+    if (mounted) {
+      setState(() {
+        _currentFilter = 'today';
+      });
+      _filterMarkers('today');
+    }
+  }
 
   // โหลดข้อมูลหมุดทั้งหมดจาก Firestore
   Future<void> _loadMarkers() async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Posts').get();
-    
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('Posts').get();
+
     for (var doc in querySnapshot.docs) {
       await _createMarkerFromDocument(doc);
     }
@@ -48,10 +50,11 @@ Future<void> _initializeMarkers() async {
     GeoPoint geoPoint = doc['location'];
     String imageUrl = doc['imageURL'];
     String catName = doc['catname'] ?? 'Unknown Cat';
-    
+
     try {
-      final BitmapDescriptor markerIcon = await _createCustomMarkerImageFromUrl(imageUrl, catName);
-      
+      final BitmapDescriptor markerIcon =
+          await _createCustomMarkerImageFromUrl(imageUrl, catName);
+
       Marker marker = Marker(
         markerId: MarkerId(doc.id),
         position: LatLng(geoPoint.latitude, geoPoint.longitude),
@@ -77,14 +80,16 @@ Future<void> _initializeMarkers() async {
     DateTime now = DateTime.now();
 
     for (var marker in _allMarkers) {
-      DocumentSnapshot? docSnapshot = await _getDocumentFromMarkerId(marker.markerId.value);
+      DocumentSnapshot? docSnapshot =
+          await _getDocumentFromMarkerId(marker.markerId.value);
       if (docSnapshot != null && docSnapshot.exists) {
-        Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
+        Map<String, dynamic>? data =
+            docSnapshot.data() as Map<String, dynamic>?;
         if (data != null && data.containsKey('timestamp')) {
           Timestamp timestamp = data['timestamp'];
           DateTime postDate = timestamp.toDate();
           Duration difference = now.difference(postDate);
-          
+
           bool shouldInclude = _shouldIncludeMarker(filter, difference);
 
           if (shouldInclude) {
@@ -116,7 +121,10 @@ Future<void> _initializeMarkers() async {
   // ดึงข้อมูลเอกสารจาก Firestore โดยใช้ markerId
   Future<DocumentSnapshot?> _getDocumentFromMarkerId(String markerId) async {
     try {
-      return await FirebaseFirestore.instance.collection('Posts').doc(markerId).get();
+      return await FirebaseFirestore.instance
+          .collection('Posts')
+          .doc(markerId)
+          .get();
     } catch (e) {
       print('เกิดข้อผิดพลาดในการดึงเอกสาร: $e');
       return null;
@@ -124,7 +132,8 @@ Future<void> _initializeMarkers() async {
   }
 
   // สร้างไอคอนหมุดแบบกำหนดเองจาก URL รูปภาพ
-  Future<BitmapDescriptor> _createCustomMarkerImageFromUrl(String url, String catName) async {
+  Future<BitmapDescriptor> _createCustomMarkerImageFromUrl(
+      String url, String catName) async {
     final int size = 150;
     final int imageSize = 120;
 
@@ -140,18 +149,22 @@ Future<void> _initializeMarkers() async {
     // โหลดและวาดรูปภาพ
     final http.Response response = await http.get(Uri.parse(url));
     final Uint8List imageData = response.bodyBytes;
-    final ui.Codec codec = await ui.instantiateImageCodec(imageData, targetWidth: imageSize, targetHeight: imageSize);
+    final ui.Codec codec = await ui.instantiateImageCodec(imageData,
+        targetWidth: imageSize, targetHeight: imageSize);
     final ui.FrameInfo fi = await codec.getNextFrame();
-    
+
     // ครอบตัดรูปภาพให้เป็นวงกลม
     final Path clipPath = Path();
-    clipPath.addOval(Rect.fromLTWH(size / 2 - imageSize / 2, size / 2 - imageSize / 2, imageSize.toDouble(), imageSize.toDouble()));
+    clipPath.addOval(Rect.fromLTWH(size / 2 - imageSize / 2,
+        size / 2 - imageSize / 2, imageSize.toDouble(), imageSize.toDouble()));
     canvas.clipPath(clipPath);
 
     canvas.drawImageRect(
       fi.image,
-      Rect.fromLTWH(0, 0, fi.image.width.toDouble(), fi.image.height.toDouble()),
-      Rect.fromLTWH(size / 2 - imageSize / 2, size / 2 - imageSize / 2, imageSize.toDouble(), imageSize.toDouble()),
+      Rect.fromLTWH(
+          0, 0, fi.image.width.toDouble(), fi.image.height.toDouble()),
+      Rect.fromLTWH(size / 2 - imageSize / 2, size / 2 - imageSize / 2,
+          imageSize.toDouble(), imageSize.toDouble()),
       Paint(),
     );
 
@@ -196,7 +209,8 @@ Future<void> _initializeMarkers() async {
                       SizedBox(height: 10),
                       Text(
                         doc['catname'] ?? 'Unknown Cat',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 8),
                       Text(doc['description'] ?? 'No description'),
@@ -240,8 +254,9 @@ Future<void> _initializeMarkers() async {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'พื้นที่',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+          'AREA',
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
         backgroundColor: Colors.lightBlue,
@@ -260,7 +275,8 @@ Future<void> _initializeMarkers() async {
     return GoogleMap(
       onMapCreated: (GoogleMapController controller) {
         mapController = controller;
-        controller.setMapStyle('[{"featureType": "poi","stylers": [{"visibility": "off"}]}]');
+        controller.setMapStyle(
+            '[{"featureType": "poi","stylers": [{"visibility": "off"}]}]');
       },
       initialCameraPosition: CameraPosition(
         target: _utccCenter,
@@ -297,7 +313,8 @@ Future<void> _initializeMarkers() async {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
-        backgroundColor: _currentFilter == filter ? Colors.lightBlue : Colors.grey,
+        backgroundColor:
+            _currentFilter == filter ? Colors.lightBlue : Colors.grey,
       ),
       child: Text(label),
       onPressed: () => _filterMarkers(filter),
