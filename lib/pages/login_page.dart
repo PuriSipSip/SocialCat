@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
             title: Center(
               child: Text(
                 message,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Color(0xF9F9F9FF)),
               ),
             ));
       },
@@ -70,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -81,16 +81,16 @@ class _LoginPageState extends State<LoginPage> {
 
                 // logo
                 Image.asset(
-                  'lib/images/Logo.png',
-                  width: 140,
-                  height: 140,
+                  'lib/images/LogoCat.png',
+                  width: 150,
+                  height: 150,
                 ),
 
                 const SizedBox(height: 50),
 
                 // Welcome back you've been missed!
                 Text(
-                  'Welcome back you\'ve been missed!',
+                  'We’ve been waiting for you, meow!',
                   style: TextStyle(
                     color: Colors.grey[700],
                   ),

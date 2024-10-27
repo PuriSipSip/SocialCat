@@ -92,7 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
             title: Center(
               child: Text(
                 message,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Color(0xF9F9F9FF)),
               ),
             ));
       },
@@ -103,7 +103,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -114,7 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 // logo
                 Image.asset(
-                  'lib/images/Logo.png',
+                  'lib/images/LogoCat.png',
                   width: 100,
                   height: 100,
                 ),

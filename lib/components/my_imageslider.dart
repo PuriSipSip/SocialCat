@@ -10,10 +10,10 @@ class MyImageSlider extends StatefulWidget {
 
 class _MyImageSliderState extends State<MyImageSlider> {
   final List<String> imagePaths = [
-    'lib/images/imageCarousel1.png',
-    'lib/images/imageCarousel2.png',
-    'lib/images/imageCarousel3.png',
-    'lib/images/imageCarousel4.png',
+    'lib/images/Carousel1.png',
+    'lib/images/Carousel2.png',
+    'lib/images/Carousel3.png',
+    'lib/images/Carousel4.png',
   ];
 
   int _currentIndex = 0;
@@ -24,7 +24,7 @@ class _MyImageSliderState extends State<MyImageSlider> {
       children: [
         CarouselSlider(
           options: CarouselOptions(
-            height: 250.0,
+            height: 200.0,
             viewportFraction: 1.0,
             enableInfiniteScroll: true,
             autoPlay: true,
@@ -39,7 +39,7 @@ class _MyImageSliderState extends State<MyImageSlider> {
               builder: (context) => Container(
                 width: MediaQuery.of(context).size.width,
                 decoration: const BoxDecoration(
-                  color: Color.fromRGBO(64, 196, 255, 1),
+                  color: Colors.white,
                 ),
                 child: Image.asset(
                   path,

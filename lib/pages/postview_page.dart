@@ -52,7 +52,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       backgroundImage:
                           CachedNetworkImageProvider(post.photoURL),
                       backgroundColor: Colors.grey[300],
-                      radius: 18,
+                      radius: 16,
                     ),
                     const SizedBox(
                       width: 8,
@@ -61,7 +61,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       post.username,
                       style: const TextStyle(
                           color: Colors.lightBlue,
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold),
                     ),
                     const Spacer(),
@@ -204,14 +204,14 @@ class _PostViewPageState extends State<PostViewPage> {
                           text: '${post.username}    ', // Username
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 14,
                             color: Colors.lightBlue,
                           ),
                         ),
                         TextSpan(
                           text: post.description, // Description
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             color: Colors.grey[800],
                             fontWeight: FontWeight.bold,
                           ),

@@ -22,10 +22,11 @@ class _CommentComponentState extends State<CommentComponent> {
       _commentController.clear(); // เคลียร์ฟิลด์กรอกข้อความหลังจากส่ง
       FocusScope.of(context).unfocus(); // ปิดคีย์บอร์ดหลังจากส่งข้อความสำเร็จ
     } else {
+      return null;
       // แสดงข้อความเตือนหากฟิลด์ว่าง
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a comment.')),
-      );
+      //ScaffoldMessenger.of(context).showSnackBar(
+      //const SnackBar(content: Text('Please enter a comment.')),
+      //);
     }
   }
 

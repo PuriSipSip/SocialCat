@@ -26,6 +26,12 @@ class _VaccineDatePickerState extends State<VaccineDatePicker> {
             Radius.circular(12),
           ),
         ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.blue, width: 2.0),
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
       ),
       validator: (value) =>
           value!.isEmpty ? 'กรุณาเลือกวันที่ได้รับวัคซีน' : null,
@@ -36,6 +42,23 @@ class _VaccineDatePickerState extends State<VaccineDatePicker> {
           initialDate: DateTime.now(),
           firstDate: DateTime(2022),
           lastDate: DateTime(2026),
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: const ColorScheme.light(
+                  primary: Colors.blue, // header background color
+                  onPrimary: Colors.white, // header text color
+                  onSurface: Colors.black, // body text color
+                ),
+                textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.blue, // button text color
+                  ),
+                ),
+              ),
+              child: child!,
+            );
+          },
         );
 
         if (pickedDate != null) {
