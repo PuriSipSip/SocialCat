@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/components/admin_selectgender.dart';
 import 'package:flutter_application_1/components/admin_vaccinedatepicker.dart';
+import 'package:flutter_application_1/components/my_addbutton.dart';
 import 'package:flutter_application_1/components/my_imagepreview.dart';
-import 'package:flutter_application_1/components/my_postbutton.dart';
 import 'package:flutter_application_1/models/cats_model.dart';
 import 'package:flutter_application_1/services/cat_service.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -297,7 +297,7 @@ class _AddCatPageState extends State<AddCatPage> {
                     value!.isEmpty ? 'กรุณากรอกอาหารชื่นชอบ' : null,
               ),
               const SizedBox(height: 16),
-              PostButton(
+              AddButton(
                 isLoading: _isLoading,
                 onPressed: () => _createCat(XFile(widget.image.path)),
               ),

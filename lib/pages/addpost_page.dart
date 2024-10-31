@@ -135,8 +135,14 @@ class _AddpostPageState extends State<AddpostPage> {
                   controller: _descriptionController,
                   decoration: InputDecoration(
                     labelText: 'Description',
+                    labelStyle: const TextStyle(color: Colors.grey),
                     prefixIcon: const Icon(Icons.edit),
                     border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          const BorderSide(color: Colors.blue, width: 2.0),
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
@@ -151,10 +157,19 @@ class _AddpostPageState extends State<AddpostPage> {
                   controller: _catNameController,
                   decoration: InputDecoration(
                     labelText: 'Cat Name',
+                    labelStyle: const TextStyle(color: Colors.grey),
                     prefixIcon: const Icon(Icons.pets),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          const BorderSide(color: Colors.blue, width: 2.0),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    hintText: "",
+                    hintStyle:
+                        const TextStyle(color: Colors.grey, fontSize: 14.0),
                   ),
                   validator: (value) =>
                       value == null || value.isEmpty ? 'กรุณากรอกแมว' : null,
