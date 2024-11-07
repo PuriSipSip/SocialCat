@@ -8,6 +8,7 @@ import 'package:flutter_application_1/auth/auth_page.dart';
 import 'package:flutter_application_1/pages/postview_page.dart';
 import 'package:flutter_application_1/models/posts_model.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_application_1/pages/change_password_page.dart';
 
 class UserprofilePage extends StatefulWidget {
   const UserprofilePage({super.key});
@@ -105,38 +106,62 @@ class _UserprofilePageState extends State<UserprofilePage> {
     );
   }
 
-  // สร้าง AppBar ที่มีข้อมูลโปรไฟล์ผู้ใช้
-  Widget _buildAppBar(Map<String, dynamic> userData) {
-    return SliverAppBar(
-      expandedHeight: 250.0,
-      floating: false,
-      pinned: true,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Stack(
-          fit: StackFit.expand,
-          children: [
-            _buildProfileHeader(userData),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: SizedBox(height: MediaQuery.of(context).padding.top),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 16.0),
-          child: IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: _logout,
-            tooltip: 'ออกจากระบบ',
+ // สร้าง AppBar ที่มีข้อมูลโปรไฟล์ผู้ใช้
+Widget _buildAppBar(Map<String, dynamic> userData) {
+  return SliverAppBar(
+    expandedHeight: 250.0,
+    floating: false,
+    pinned: true,
+    flexibleSpace: FlexibleSpaceBar(
+      background: Stack(
+        fit: StackFit.expand,
+        children: [
+          _buildProfileHeader(userData),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SizedBox(height: MediaQuery.of(context).padding.top),
           ),
-        ),
-      ],
-    );
-  }
+        ],
+      ),
+    ),
+    actions: [
+      Padding(
+        padding: const EdgeInsets.only(right: 16.0),
+        child: PopupMenuButton(
+          icon: const Icon(Icons.more_vert, color: Colors.white),
+          itemBuilder: (context) => [
+             PopupMenuItem(
+      child: ListTile(
+        leading: const Icon(Icons.lock), // เปลี่ยนไอคอนเป็นรูปกุญแจ
+        title: const Text('แก้ไขรหัสผ่าน'), // เปลี่ยนข้อความ
+        onTap: () async {
+          Navigator.pop(context); // ปิด popup menu
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ChangePasswordPage()),
+          );
+          setState(() {}); // รีเฟรชหน้าเมื่อกลับมา
+        },
+      ),
+    ),
+    PopupMenuItem(
+      child: ListTile(
+        leading: const Icon(Icons.logout),
+        title: const Text('ออกจากระบบ'),
+        onTap: () {
+          Navigator.pop(context); // ปิด popup menu
+          _logout(); // เรียกใช้ฟังก์ชัน logout ที่มีอยู่แล้ว
+        },
+      ),
+    ),
+  ],
+),
+      ),
+    ],
+  );
+}
 
   // สร้างส่วนหัวของโปรไฟล์ที่แสดงข้อมูลผู้ใช้
   Widget _buildProfileHeader(Map<String, dynamic> userData) {
