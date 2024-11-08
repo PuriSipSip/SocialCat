@@ -2,6 +2,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/my_imagepreview.dart';
 import 'package:flutter_application_1/components/my_postbutton.dart';
+import 'package:flutter_application_1/pages/qrscanner_catname_page.dart';
 import 'package:flutter_application_1/services/location_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/models/posts_model.dart';
@@ -170,6 +171,30 @@ class _AddpostPageState extends State<AddpostPage> {
                     hintText: "",
                     hintStyle:
                         const TextStyle(color: Colors.grey, fontSize: 14.0),
+                    // Add a suffix icon that is to the right of the text field
+                    suffixIcon: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const QrscannerCatnamePage()),
+                          //สำหรับการดึง catname มาใส่ในช่อง _catNameController
+                        ).then(
+                          (value) {
+                            if (value != null) {
+                              setState(
+                                () {
+                                  _catNameController.text = value;
+                                },
+                              );
+                            }
+                          },
+                        );
+                      },
+                      child: const Icon(Icons.qr_code_scanner_rounded,
+                          color: Colors.grey),
+                    ),
                   ),
                   validator: (value) =>
                       value == null || value.isEmpty ? 'กรุณากรอกแมว' : null,
