@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/qrscanner_page.dart';
 import 'package:flutter_application_1/pages/addcat_page.dart';
 import 'package:flutter_application_1/pages/addpost_page.dart';
-import 'package:flutter_application_1/pages/edit_deleate_cat_page.dart';
+import 'package:flutter_application_1/pages/edit_delete_cat_page.dart';
 import 'package:image_picker/image_picker.dart';
 
 Future<void> showImagePickerBottomSheet(BuildContext context) async {
