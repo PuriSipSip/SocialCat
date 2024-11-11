@@ -17,28 +17,31 @@ class _EditProfilePageState extends State<EditProfilePage> {
   File? _image;
   bool _isLoading = false;
   String? _currentPhotoURL;
-  String? _originalUsername; // Store original username to check if it changed
+  String? _originalUsername; // เก็บ username เดิมเพื่อตรวจสอบการเปลี่ยนแปลง
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _loadUserData(); // โหลดข้อมูลผู้ใช้เมื่อเริ่มต้นหน้า
   }
 
-  // Load user data from Firestore
+  // โหลดข้อมูลผู้ใช้จาก Firestore
   Future<void> _loadUserData() async {
     setState(() => _isLoading = true);
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
+        // ดึงข้อมูลผู้ใช้จาก collection Users โดยใช้ email เป็น key
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('Users')
             .doc(user.email)
             .get();
         Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+        
+        // กำหนดค่าให้กับ controller และตัวแปรต่างๆ
         setState(() {
           _usernameController.text = userData['username'] ?? '';
-          _originalUsername = userData['username']; // Store original username
+          _originalUsername = userData['username']; 
           _bioController.text = userData['bio'] ?? '';
           _currentPhotoURL = userData['photoURL'];
         });
@@ -49,9 +52,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     setState(() => _isLoading = false);
   }
 
-  // Upload profile image to Firebase Storage
+  // อัพโหลดรูปภาพโปรไฟล์ไปยัง Firebase Storage
   Future<String?> _uploadProfileImage(User user) async {
     if (_image != null) {
+      // สร้างชื่อไฟล์จาก uid ของผู้ใช้
       String fileName = 'profile_${user.uid}.jpg';
       Reference ref = FirebaseStorage.instance.ref().child('profile_images/$fileName');
       await ref.putFile(_image!);
@@ -60,8 +64,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return null;
   }
 
-  // Update user data in Firestore
+  // อัพเดทข้อมูลผู้ใช้ใน Firestore
   Future<void> _updateUserData(User user, String? imageUrl) async {
+    // สร้าง Map เก็บข้อมูลที่จะอัพเดท
     Map<String, dynamic> updateData = {
       'username': _usernameController.text,
       'bio': _bioController.text,
@@ -70,20 +75,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
       updateData['photoURL'] = imageUrl;
     }
     
-    // Update user document
+    // อัพเดทข้อมูลใน collection Users
     await FirebaseFirestore.instance
         .collection('Users')
         .doc(user.email)
         .update(updateData);
 
-    // Only update posts if username changed
+    // ถ้ามีการเปลี่ยนแปลง username ให้อัพเดทข้อมูลในโพสต์ด้วย
     if (_originalUsername != _usernameController.text) {
       await _updateUserPosts(user, imageUrl);
     }
   }
 
-  // Update username and photo URL in all user's posts
+  // อัพเดท username และ photoURL ในโพสต์ทั้งหมดของผู้ใช้
   Future<void> _updateUserPosts(User user, String? imageUrl) async {
+    // ดึงโพสต์ทั้งหมดของผู้ใช้
     QuerySnapshot postsSnapshot = await FirebaseFirestore.instance
         .collection('Posts')
         .where('email', isEqualTo: user.email)
@@ -104,7 +110,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     await batch.commit();
   }
 
-  // Update profile with all changes
+  // อัพเดทโปรไฟล์ทั้งหมด
   Future<void> _updateProfile() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
@@ -113,29 +119,31 @@ class _EditProfilePageState extends State<EditProfilePage> {
         if (user != null) {
           String? imageUrl = await _uploadProfileImage(user);
           await _updateUserData(user, imageUrl);
-          _showSuccessSnackBar('Profile updated successfully');
+          _showSuccessSnackBar('อัพเดทโปรไฟล์สำเร็จ');
           Navigator.pop(context);
         }
       } catch (e) {
-        _showErrorSnackBar('Error updating profile: $e');
+        _showErrorSnackBar('เกิดข้อผิดพลาดในการอัพเดทโปรไฟล์: $e');
       }
       setState(() => _isLoading = false);
     }
   }
 
+  // แสดง SnackBar แจ้งเตือนข้อผิดพลาด
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
+  // แสดง SnackBar แจ้งเตือนสำเร็จ
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.green),
     );
   }
 
-  // UI implementation remains the same...
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -190,6 +198,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+    // สร้าง Widget สำหรับแสดงและเลือกรูปโปรไฟล์
   Widget _buildProfileImage() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 20),
@@ -226,6 +235,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  // เลือกรูปภาพจากแกลลอรี่
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);

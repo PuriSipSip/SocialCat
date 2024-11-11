@@ -12,9 +12,13 @@ class AreaPage extends StatefulWidget {
 
 class _AreaPageState extends State<AreaPage> {
   late GoogleMapController mapController;
+  // กำหนดพิกัดศูนย์กลางของ UTCC
   final LatLng _utccCenter = const LatLng(13.7768, 100.5592);
+  // เก็บ markers ทั้งหมด
   Set<Marker> _allMarkers = {};
+  // เก็บ markers ที่ผ่านการกรอง
   Set<Marker> _filteredMarkers = {};
+  // ตัวกรองปัจจุบัน (today, threeDays, all)
   String _currentFilter = 'today';
 
   @override
@@ -23,6 +27,7 @@ class _AreaPageState extends State<AreaPage> {
     _initializeMarkers();
   }
 
+  // ฟังก์ชันเริ่มต้นโหลด markers
   Future<void> _initializeMarkers() async {
     await _loadMarkers();
     if (mounted) {
@@ -33,6 +38,7 @@ class _AreaPageState extends State<AreaPage> {
     }
   }
 
+  // โหลด markers จาก Firestore
   Future<void> _loadMarkers() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Posts').get();
     
@@ -42,14 +48,17 @@ class _AreaPageState extends State<AreaPage> {
     _filterMarkers('all');
   }
 
+  // สร้าง marker จากเอกสาร Firestore
   Future<void> _createMarkerFromDocument(DocumentSnapshot doc) async {
     GeoPoint geoPoint = doc['location'];
     String imageUrl = doc['imageURL'];
     String catName = doc['catname'] ?? 'Unknown Cat';
     
     try {
+      // สร้างไอคอน marker แบบกำหนดเอง
       final BitmapDescriptor markerIcon = await _createCustomMarkerImageFromUrl(imageUrl, catName);
       
+      // สร้าง marker ใหม่
       Marker marker = Marker(
         markerId: MarkerId(doc.id),
         position: LatLng(geoPoint.latitude, geoPoint.longitude),
@@ -65,6 +74,7 @@ class _AreaPageState extends State<AreaPage> {
     }
   }
 
+  // กรอง markers ตามช่วงเวลา
   Future<void> _filterMarkers(String filter) async {
     setState(() {
       _currentFilter = filter;
@@ -73,6 +83,7 @@ class _AreaPageState extends State<AreaPage> {
     Set<Marker> newFilteredMarkers = {};
     DateTime now = DateTime.now();
 
+    // วนลูปตรวจสอบแต่ละ marker
     for (var marker in _allMarkers) {
       DocumentSnapshot? docSnapshot = await _getDocumentFromMarkerId(marker.markerId.value);
       if (docSnapshot != null && docSnapshot.exists) {
@@ -82,6 +93,7 @@ class _AreaPageState extends State<AreaPage> {
           DateTime postDate = timestamp.toDate();
           Duration difference = now.difference(postDate);
           
+          // ตรวจสอบว่าควรแสดง marker นี้หรือไม่
           bool shouldInclude = _shouldIncludeMarker(filter, difference);
           if (shouldInclude) {
             newFilteredMarkers.add(marker);
@@ -95,6 +107,7 @@ class _AreaPageState extends State<AreaPage> {
     });
   }
 
+  // ตรวจสอบว่า marker ควรถูกแสดงตามเงื่อนไขการกรองหรือไม่
   bool _shouldIncludeMarker(String filter, Duration difference) {
     switch (filter) {
       case 'today':
@@ -108,6 +121,7 @@ class _AreaPageState extends State<AreaPage> {
     }
   }
 
+  // ดึงข้อมูลเอกสารจาก Firestore โดยใช้ markerId
   Future<DocumentSnapshot?> _getDocumentFromMarkerId(String markerId) async {
     try {
       return await FirebaseFirestore.instance.collection('Posts').doc(markerId).get();
@@ -117,27 +131,33 @@ class _AreaPageState extends State<AreaPage> {
     }
   }
 
+  // สร้างไอคอน marker แบบกำหนดเองจาก URL รูปภาพ
   Future<BitmapDescriptor> _createCustomMarkerImageFromUrl(String url, String catName) async {
     final int size = 150;
     final int imageSize = 120;
 
+    // สร้าง Canvas สำหรับวาดไอคอน
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
     final Paint shadowPaint = Paint()..color = Colors.black.withOpacity(0.3);
     final Paint bgPaint = Paint()..color = Colors.black;
 
+    // วาดเงาและพื้นหลัง
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2, shadowPaint);
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2 - 3, bgPaint);
 
+    // โหลดและปรับขนาดรูปภาพ
     final http.Response response = await http.get(Uri.parse(url));
     final Uint8List imageData = response.bodyBytes;
     final ui.Codec codec = await ui.instantiateImageCodec(imageData, targetWidth: imageSize, targetHeight: imageSize);
     final ui.FrameInfo fi = await codec.getNextFrame();
     
+    // ตัดรูปภาพให้เป็นวงกลม
     final Path clipPath = Path();
     clipPath.addOval(Rect.fromLTWH(size / 2 - imageSize / 2, size / 2 - imageSize / 2, imageSize.toDouble(), imageSize.toDouble()));
     canvas.clipPath(clipPath);
 
+    // วาดรูปภาพ
     canvas.drawImageRect(
       fi.image,
       Rect.fromLTWH(0, 0, fi.image.width.toDouble(), fi.image.height.toDouble()),
@@ -145,12 +165,14 @@ class _AreaPageState extends State<AreaPage> {
       Paint(),
     );
 
+    // แปลงเป็น BitmapDescriptor
     final img = await pictureRecorder.endRecording().toImage(size, size);
     final data = await img.toByteData(format: ui.ImageByteFormat.png);
 
     return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
   }
 
+  // แสดงรายละเอียดโพสต์เมื่อกดที่ marker
   void _showPostDetails(DocumentSnapshot doc) {
     showDialog(
       context: context,
@@ -203,6 +225,7 @@ class _AreaPageState extends State<AreaPage> {
     );
   }
 
+  // สร้างส่วนแสดงข้อมูลผู้ใช้ในรายละเอียดโพสต์
   Widget _buildUserInfo(DocumentSnapshot doc) {
     return Row(
       children: [
@@ -222,31 +245,12 @@ class _AreaPageState extends State<AreaPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'AREA',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.lightBlue,
-      ),
-      body: Stack(
-        children: [
-          _buildGoogleMap(),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-      floatingActionButton: _buildFilterButton(),
-    );
-  }
-
+  // สร้างส่วนแสดงแผนที่
   Widget _buildGoogleMap() {
     return GoogleMap(
       onMapCreated: (GoogleMapController controller) {
         mapController = controller;
+        // ปิดการแสดง POI บนแผนที่
         controller.setMapStyle('[{"featureType": "poi","stylers": [{"visibility": "off"}]}]');
       },
       initialCameraPosition: CameraPosition(
@@ -257,6 +261,7 @@ class _AreaPageState extends State<AreaPage> {
     );
   }
 
+  // สร้างปุ่มตัวกรอง
   Widget _buildFilterButton() {
     return FloatingActionButton.extended(
       onPressed: () {
@@ -287,6 +292,7 @@ class _AreaPageState extends State<AreaPage> {
     );
   }
 
+  // แปลงค่าตัวกรองเป็นข้อความภาษาไทย
   String _getFilterLabel() {
     switch (_currentFilter) {
       case 'today':
@@ -300,6 +306,7 @@ class _AreaPageState extends State<AreaPage> {
     }
   }
 
+  // สร้างตัวเลือกในเมนูตัวกรอง
   Widget _buildFilterOption(String label, String filter, IconData icon) {
     return ListTile(
       leading: Icon(icon, color: _currentFilter == filter ? Colors.lightBlueAccent : Colors.grey),
@@ -315,6 +322,27 @@ class _AreaPageState extends State<AreaPage> {
         _filterMarkers(filter);
         Navigator.pop(context);
       },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'AREA',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.lightBlue,
+      ),
+      body: Stack(
+        children: [
+          _buildGoogleMap(),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+      floatingActionButton: _buildFilterButton(),
     );
   }
 }
